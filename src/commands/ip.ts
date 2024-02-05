@@ -14,7 +14,7 @@ export async function ipaddr(senderNumber: string): Promise<void> {
 
     const bodyResponse = res.body as IpAddrResult
 
-    await utils.sendText(bodyResponse.ip, senderNumber);
+    await utils.sendText(`🏓 Server IP Address\n \`\`\`${bodyResponse.ip}\`\`\``, senderNumber);
   } catch (e) {
     console.log(e);
   }
