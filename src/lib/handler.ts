@@ -1,9 +1,10 @@
 import { downloadMediaMessage, getContentType } from "@whiskeysockets/baileys";
 import { ipaddr } from "../commands/ip.js";
 import { helpCommand } from "../commands/help.js";
-import utils from "./utils.js";
 import { speedtest } from "../commands/speedtest.js";
 import { shell } from "../commands/shell.js";
+import { sticker } from "../commands/sticker.js";
+import utils from "./utils.js";
 
 interface AttachmentInfo {
   type: "video" | "image" | "audio";
@@ -85,23 +86,27 @@ export default async function (sock: any, m: any): Promise<void> {
     if (firstmess) {
       switch (pesan) {
         case "help":
-          helpCommand(senderNumber, m)
-          break
+          await helpCommand(senderNumber, m);
+          break;
         case "p":
           console.log(m.args);
           break;
         case "ip":
-          ipaddr(senderNumber);
+          await ipaddr(senderNumber);
           break;
         case "test":
           utils.sendText("testo testo", senderNumber);
           break;
         case "speedtest":
           utils.sendText("Performing server speedtest...", senderNumber);
-          speedtest(senderNumber, m)
+          await speedtest(senderNumber, m);
           break;
         case "shell":
-          shell(m.args, senderNumber, m)
+          await shell(m.args, senderNumber, m);
+          break;
+        case "sticker":
+          const media = await downloadMediaMessage(m, "buffer", {});
+          await sticker(senderNumber, media, m);
           break;
       }
     }
