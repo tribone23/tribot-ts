@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^6.6.0",
+    "axios": "^1.6.7",
     "phin": "^3.7.0",
     "wa-sticker-formatter": "^4.4.4"
   }
