@@ -16,14 +16,14 @@ export async function tiktok(url: Array<string>, senderNumber: string, m: any) {
             const data: AttachmentInfo = {
                 type: 'video',
                 url: result.result?.data.url!,
-                caption: `Status: Success\nDirect Link: ${result.result?.data
+                caption: `✨ Direct Link: ${result.result?.data
                     .url!}`,
             }
 
             await utils.sendAttachment(data, senderNumber, m)
             const end = performance.now()
             await utils.sendText(
-                `⏱️ Command execution success, it tooks ${
+                `⏱️ it tooks ${
                     end - start
                 } miliseconds`,
                 senderNumber
