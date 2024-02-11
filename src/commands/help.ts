@@ -5,7 +5,7 @@ export async function helpCommand(senderNumber: string, m: any) {
     let prefix = /^[\\/!#.]/gi.test(m.args[0])
         ? m.args[0].match(/^[\\/!#.]/gi)
         : '/'
-    let commandList = ['help', 'ip', 'speedtest', 'test', 'shell', 'sticker']
+    let commandList = ['help', 'ip', 'speedtest', 'test', 'shell', 'sticker', 'tiktok']
 
     const usage = `*Usage*\n[prefix](command)\n\n-- _Example_ --:\n\`\`\`${prefix}${commandList[2]}\`\`\`\n`
     const text = `${helpCmd}\n\n*MAIN*\n\`\`\`${commandList}\`\`\`\n\n${usage}`
