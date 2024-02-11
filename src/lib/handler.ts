@@ -4,13 +4,8 @@ import { helpCommand } from '../commands/help.js'
 import { speedtest } from '../commands/speedtest.js'
 import { shell } from '../commands/shell.js'
 import { sticker } from '../commands/sticker.js'
+import { tiktok } from '../commands/tiktok.js'
 import utils from './utils.js'
-
-interface AttachmentInfo {
-    type: 'video' | 'image' | 'audio'
-    url: string
-    caption?: string
-}
 
 export default async function (sock: any, m: any): Promise<void> {
     const senderNumber: string = m.key.remoteJid
@@ -57,26 +52,6 @@ export default async function (sock: any, m: any): Promise<void> {
     //   await sock.sendMessage(senderNumber, { text }, { quoted: m });
     // };
 
-    const sendAttachment = async (attachmentInfo: AttachmentInfo) => {
-        const { type, url, caption } = attachmentInfo
-
-        if (type === 'video') {
-            await sock.sendMessage(
-                senderNumber,
-                { caption: caption || 'Nyo videone', video: { url: url } },
-                { quoted: m }
-            )
-        } else if (type === 'image') {
-            await sock.sendMessage(
-                senderNumber,
-                { caption: caption || 'Nyo Gambare', image: { url: url } },
-                { quoted: m }
-            )
-        } else {
-            console.log('kapan kapan')
-        }
-    }
-
     try {
         let prefix = /^[\\/!#.]/gi.test(body) ? body.match(/^[\\/!#.]/gi) : '/'
         const firstmess = body.startsWith(prefix)
@@ -115,6 +90,9 @@ export default async function (sock: any, m: any): Promise<void> {
                 case 'sticker':
                     const media = await downloadMediaMessage(m, 'buffer', {})
                     await sticker(senderNumber, media, m)
+                    break
+                case 'tiktok':
+                    await tiktok(m.args, senderNumber, m)
                     break
             }
         }
