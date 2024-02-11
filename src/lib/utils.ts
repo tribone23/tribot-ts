@@ -1,8 +1,29 @@
 import { AnyMessageContent } from '@whiskeysockets/baileys'
+import { AttachmentInfo } from './types'
 import { sock } from '../index.js'
 
 const sendText = async (text: string, senderNumber: string): Promise<void> => {
     await sock.sendMessage(senderNumber, { text: text })
+}
+
+const sendAttachment = async (attachmentInfo: AttachmentInfo, senderNumber: string, m: any) => {
+    const { type, url, caption } = attachmentInfo
+
+    if (type === 'video') {
+        await sock.sendMessage(
+            senderNumber,
+            { caption: caption || 'Nyo videone', video: { url: url } },
+            { quoted: m }
+        )
+    } else if (type === 'image') {
+        await sock.sendMessage(
+            senderNumber,
+            { caption: caption || 'Nyo Gambare', image: { url: url } },
+            { quoted: m }
+        )
+    } else {
+        console.log('kapan kapan')
+    }
 }
 
 const reply = async (
@@ -38,6 +59,7 @@ const replyWithImages = async (
 
 const utils = {
     sendText,
+    sendAttachment,
     reply,
     replyWithImages,
     replyWithSticker,
