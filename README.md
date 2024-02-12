@@ -6,4 +6,7 @@ TriBOT written in typescript language
 
 **_Under development_
 
+### Feature
+_help_, _ip_, _speedtest_, _shell_, _sticker_, _tiktok_ 
+
 ### Readme will be updated soon
