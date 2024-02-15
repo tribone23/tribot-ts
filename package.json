@@ -8,8 +8,7 @@
     "build": "tsc",
     "start": "node .",
     "lint": "eslint --ignore-path .eslintignore 'src/**/*.ts'",
-    "format": "prettier --ignore-path .gitignore --write \"src/**/*.+(js|ts|json)\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "prettier --ignore-path .gitignore --write \"src/**/*.+(js|ts|json)\""
   },
   "keywords": [],
   "author": "",
@@ -29,6 +28,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@hapi/boom": "^10.0.1",
     "@whiskeysockets/baileys": "^6.6.0",
     "axios": "^1.6.7",
     "phin": "^3.7.0",
