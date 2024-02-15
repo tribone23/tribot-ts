@@ -33,7 +33,7 @@ jobs:
             cd ~/apps/tribot-ts
             git pull origin master
             git status
-            pnpm install
-            pnpm build
+            npm install
+            npm build
             pm2 reload tribot-ts
             pm2 restart tribot-ts
