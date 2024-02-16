@@ -59,16 +59,16 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       const prefix = prefixMatch instanceof Array ? prefixMatch[0] : '/';
       const trimmedBody = body.replace(prefix, '').trim();
       const words = trimmedBody.split(/ +/);
-      let pesan;
+      let command;
 
       if (words.length > 0) {
-        pesan = words[0].toLowerCase();
+        command = words[0].toLowerCase();
         m.args = words.slice(1);
       } else {
         m.args = [];
       }
 
-      switch (pesan) {
+      switch (command) {
         case 'help':
           await helpCommand(senderNumber, m);
           break;
