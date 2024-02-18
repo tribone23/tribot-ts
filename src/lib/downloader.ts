@@ -21,7 +21,7 @@ type Result = {
 export async function getTiktokVideo(url: string): Promise<Result> {
   try {
     const { data } = await axios.get<TiktokApiResponse>(
-      `https://api-tools-backup.tribone.my.id/servertiktok3?url=${url}`,
+      `https://api-tools.tribone.my.id/servertiktok3?url=${url}`,
       {
         headers: {
           Accept: 'application/json',
