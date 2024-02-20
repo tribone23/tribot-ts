@@ -88,6 +88,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         case 'shell':
           await shell(m.args, senderNumber, m);
           break;
+        case 's':
         case 'sticker': {
           const media = await downloadMediaMessage(m, 'buffer', {});
           if (media instanceof Buffer) {
