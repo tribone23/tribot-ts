@@ -85,6 +85,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           utils.sendText('Performing server speedtest...', senderNumber);
           await speedtest(senderNumber, m);
           break;
+        case 'sh':
         case 'shell':
           await shell(m.args, senderNumber, m);
           break;
