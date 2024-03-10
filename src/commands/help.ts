@@ -15,6 +15,7 @@ export async function helpCommand(
     'shell',
     'sticker',
     'tiktok',
+    'aimode',
   ];
 
   const usage = `*Usage*\n[prefix](command)\n\n-- _Example_ --:\n\`\`\`${prefix}${commandList[2]}\`\`\`\n`;
