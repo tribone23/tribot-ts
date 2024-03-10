@@ -6,6 +6,7 @@ import { speedtest } from '../commands/speedtest.js';
 import { shell } from '../commands/shell.js';
 import { sticker } from '../commands/sticker.js';
 import { tiktok } from '../commands/tiktok.js';
+import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import utils from './utils.js';
 
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
@@ -68,6 +69,8 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         m.args = [];
       }
 
+      const userState = await aiChatHandler(body, command, senderNumber);
+
       switch (command) {
         case 'help':
           await helpCommand(senderNumber, m);
@@ -79,7 +82,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           await ipaddr(senderNumber);
           break;
         case 'test':
-          utils.sendText('testo testo', senderNumber);
+          utils.sendText(`testo testo dari ${m.pushName}`, senderNumber);
           break;
         case 'speedtest':
           utils.sendText('Performing server speedtest...', senderNumber);
@@ -102,6 +105,23 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         case 'tiktok':
           await tiktok(m.args, senderNumber, m);
           break;
+        case 'aimode': {
+          userState.aiModeEnabled = true;
+          aiModeUsers.set(senderNumber, userState);
+
+          if (userState.characterId) {
+            utils.sendText(
+              `Memasuki mode AI dengan Character ID tersimpan *${userState.characterId}*\n\n[-] \`\`\`/reset /exit\`\`\`\n`,
+              senderNumber,
+            );
+          } else {
+            utils.sendText(
+              'Memasuki mode AI, silahkan masukkan ID Character..',
+              senderNumber,
+            );
+          }
+          break;
+        }
       }
     } catch (err) {
       console.log(err);

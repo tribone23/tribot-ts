@@ -11,3 +11,8 @@ export interface AttachmentInfo {
   url?: string;
   caption?: string;
 }
+
+export interface UserState {
+  aiModeEnabled: boolean;
+  characterId?: string;
+}
