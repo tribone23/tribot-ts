@@ -69,7 +69,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         m.args = [];
       }
 
-      const userState = await aiChatHandler(body, command, senderNumber);
+      const userState = await aiChatHandler(body, command, senderNumber, m.pushName);
 
       switch (command) {
         case 'help':

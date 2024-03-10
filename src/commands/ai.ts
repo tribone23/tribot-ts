@@ -8,6 +8,7 @@ export async function aiChatHandler(
   body: string,
   command: string | undefined,
   senderNumber: string,
+  senderName: string | null | undefined,
 ) {
   const userState = aiModeUsers.get(senderNumber) ?? {
     aiModeEnabled: false,
@@ -32,7 +33,7 @@ export async function aiChatHandler(
 
       default:
         if (userState.characterId) {
-          const userMessage = body;
+          const userMessage = `${senderName}: ${body}`;
           const characterResponse: ApiResponseAi = await chatWithAi(
             userState.characterId,
             userMessage,
