@@ -92,7 +92,7 @@ const owner1 = process.env.OWNER1;
           break;
         case 'sh':
         case 'shell':
-          if (who !== owner1 || who !== owner 2) {
+          if (who !== owner1) {
             utils.sendText("gabole ☺️", senderNumber);
           } else {
           await shell(m.args, senderNumber, m);
