@@ -8,11 +8,13 @@ import { sticker } from '../commands/sticker.js';
 import { tiktok } from '../commands/tiktok.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import utils from './utils.js';
+import 'dotenv/config'
 
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
   const senderNumber: string = m.key.remoteJid ?? '';
   let body;
-
+const owner1 = process.env.OWNER1;
+  const owner2 = process.env.OWNER2;
   if (m.message) {
     m.mtype = getContentType(m.message);
 
@@ -90,6 +92,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           break;
         case 'sh':
         case 'shell':
+          if (!owner1 || !owner2) return utils.sendText("gabole ☺️", senderNumber);
           await shell(m.args, senderNumber, m);
           break;
         case 's':
