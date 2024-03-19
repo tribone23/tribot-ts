@@ -72,7 +72,7 @@ const owner1 = process.env.OWNER1;
       }
 
       const userState = await aiChatHandler(body, command, senderNumber, m.pushName);
-
+      let who: string = m.key.participant;
       switch (command) {
         case 'help':
           await helpCommand(senderNumber, m);
@@ -92,7 +92,7 @@ const owner1 = process.env.OWNER1;
           break;
         case 'sh':
         case 'shell':
-          if (senderNumber !== owner2) {
+          if (who !== owner1 || who !== owner 2) {
             utils.sendText("gabole ☺️", senderNumber);
           } else {
           await shell(m.args, senderNumber, m);
