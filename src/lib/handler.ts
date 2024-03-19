@@ -92,8 +92,11 @@ const owner1 = process.env.OWNER1;
           break;
         case 'sh':
         case 'shell':
-          if (!owner1) return utils.sendText("gabole ☺️", senderNumber);
+          if (!owner1) {
+            return utils.sendText("gabole ☺️", senderNumber);
+          } else {
           await shell(m.args, senderNumber, m);
+          }
           break;
         case 's':
         case 'sticker': {
