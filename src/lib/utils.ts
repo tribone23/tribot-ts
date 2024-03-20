@@ -64,6 +64,7 @@ const sendAudio = async (
   senderNumber: string,
   url: string,
   m: IWebMessageInfoExtended,
+  mimetype: string,
 ): Promise<void> => {
   await sock.sendMessage(
     senderNumber,
