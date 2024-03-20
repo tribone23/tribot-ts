@@ -60,13 +60,24 @@ const replyWithImages = async (
     { quoted: m, mediaUploadTimeoutMs: 1000 * 60 },
   );
 };
-
+const sendAudio = async (
+  senderNumber: string,
+  url: string,
+  m: IWebMessageInfoExtended,
+): Promise<void> => {
+  await sock.sendMessage(
+    senderNumber,
+    { audio: { url: url ?? '' }, mimetype: mimetype ?? 'audio/mp4' },
+    { quoted: m, url: 'audio.mp3' },
+  );
+};
 const utils = {
   sendText,
   sendAttachment,
   reply,
   replyWithImages,
   replyWithSticker,
+  sendAudio,
 };
 
 export default utils;

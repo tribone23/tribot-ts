@@ -10,6 +10,7 @@ import { sticker } from '../commands/sticker.js';
 import { tiktok } from '../commands/tiktok.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import utils from './utils.js';
+import tes from './tes.js';
 import 'dotenv/config';
 
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
@@ -95,7 +96,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           await ipaddr(senderNumber);
           break;
         case 'test':
-          utils.sendText(`testo testo dari ${m.pushName}`, senderNumber);
+          //utils.sendText(`testo testo dari ${m.pushName}`, senderNumber);
           break;
         case 'speedtest':
           utils.sendText('Performing server speedtest...', senderNumber);
@@ -108,6 +109,9 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           } else {
             const filePath = path.resolve('./src/media/dikira_lucu.jpg');
             const media = fs.readFileSync(filePath);
+            const vn: string =
+              'https://bucin-livid.vercel.app/audio/lusiapa.mp3';
+            await utils.sendAudio(senderNumber, vn, m);
             await sticker(senderNumber, media, m);
           }
           break;
