@@ -31,6 +31,7 @@
     "@hapi/boom": "^10.0.1",
     "@whiskeysockets/baileys": "^6.6.0",
     "axios": "^1.6.7",
+    "dotenv": "^16.4.5",
     "phin": "^3.7.0",
     "wa-sticker-formatter": "^4.4.4"
   }

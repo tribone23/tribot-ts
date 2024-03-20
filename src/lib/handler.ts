@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { downloadMediaMessage, getContentType } from '@whiskeysockets/baileys';
 import { IWebMessageInfoExtended } from './types.js';
 import { ipaddr } from '../commands/ip.js';
@@ -8,13 +10,14 @@ import { sticker } from '../commands/sticker.js';
 import { tiktok } from '../commands/tiktok.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import utils from './utils.js';
-import 'dotenv/config'
+import 'dotenv/config';
 
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
   const senderNumber: string = m.key.remoteJid ?? '';
   let body;
-const owner1 = process.env.OWNER1;
+  const owner1 = process.env.OWNER1;
   const owner2 = process.env.OWNER2;
+
   if (m.message) {
     m.mtype = getContentType(m.message);
 
@@ -71,8 +74,16 @@ const owner1 = process.env.OWNER1;
         m.args = [];
       }
 
-      const userState = await aiChatHandler(body, command, senderNumber, m.pushName);
+      const userState = await aiChatHandler(
+        body,
+        command,
+        senderNumber,
+        m.pushName,
+      );
       const who = m.key.participant ? m.key.participant : m.key.remoteJid;
+
+      console.log(who);
+
       switch (command) {
         case 'help':
           await helpCommand(senderNumber, m);
@@ -91,13 +102,16 @@ const owner1 = process.env.OWNER1;
           await speedtest(senderNumber, m);
           break;
         case 'sh':
-        case 'shell':
-          if (who !== owner1 || who !== owner2) {
-            utils.sendText("gabole ☺️", senderNumber);
+        case 'shell': {
+          if (who === owner1 || who === owner2) {
+            await shell(m.args, senderNumber, m);
           } else {
-          await shell(m.args, senderNumber, m);
+            const filePath = path.resolve('./src/media/dikira_lucu.jpg');
+            const media = fs.readFileSync(filePath);
+            await sticker(senderNumber, media, m);
           }
           break;
+        }
         case 's':
         case 'sticker': {
           const media = await downloadMediaMessage(m, 'buffer', {});
