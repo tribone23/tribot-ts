@@ -1,9 +1,15 @@
-import { AnyMessageContent } from '@whiskeysockets/baileys';
+import { AnyMessageContent, PollMessageOptions } from '@whiskeysockets/baileys';
 import { AttachmentInfo, IWebMessageInfoExtended } from './types';
 import { sock } from '../index.js';
 
 const sendText = async (text: string, senderNumber: string): Promise<void> => {
-  await sock.sendMessage(senderNumber, { text: text });
+  await sock.sendMessage(senderNumber, { text: text});
+};
+
+const sendLink = async (text: string, senderNumber: string ): Promise<void> => {
+await sock.sendMessage(senderNumber, {
+  text: text,
+});
 };
 
 const sendAttachment = async (
@@ -11,7 +17,8 @@ const sendAttachment = async (
   senderNumber: string,
   m: IWebMessageInfoExtended,
 ) => {
-  const { type, url, caption } = attachmentInfo;
+  const { type, url, caption, mimetype } = attachmentInfo;
+  console.log(url, caption, type)
 
   if (type === 'video') {
     await sock.sendMessage(
@@ -23,8 +30,15 @@ const sendAttachment = async (
     await sock.sendMessage(
       senderNumber,
       { caption: caption || 'Nyo Gambare', image: { url: url ?? '' } },
-      { quoted: m },
     );
+  } else if (type === 'audio') {
+  await sock.sendMessage(
+    senderNumber,
+    {
+      audio: { url: url ?? '' },
+      mimetype: mimetype ?? 'audio/mp4',
+    },
+  );
   } else {
     console.log('kapan kapan');
   }
@@ -61,12 +75,56 @@ const replyWithImages = async (
   );
 };
 
+const sendPoll = async (
+  poll: PollMessageOptions,
+  senderNumber: string,
+  m: IWebMessageInfoExtended,
+) => {
+  await sock.sendMessage(senderNumber, { poll }, { quoted: m });
+};
+
+const sendButtons = async (
+  senderNumber: string,
+  m: IWebMessageInfoExtended,
+) => {
+  const buttons = [
+    { buttonId: 'id1', buttonText: { displayText: 'Info 1!' } },
+    { buttonId: 'id2', buttonText: { displayText: 'Info 2!' } },
+    { buttonId: 'id3', buttonText: { displayText: '💵 Info 3' } },
+  ];
+
+  const buttonInfo = {
+    text: 'Info Warung Kopi',
+    buttons: buttons,
+    viewOnce: true,
+    headerType: 1,
+  };
+  await sock.sendMessage(senderNumber, buttonInfo, { quoted: m });
+};
+
+const sendAudio = async (
+  senderNumber: string,
+  url: string,
+  m: IWebMessageInfoExtended,
+  mimetype?: string,
+): Promise<void> => {
+  await sock.sendMessage(
+    senderNumber,
+    { audio: { url: url ?? '' }, mimetype: mimetype ?? 'audio/mp4', caption: 'Nyo audione'},
+    { quoted: m },
+  );
+};
+
 const utils = {
   sendText,
+  sendLink,
   sendAttachment,
   reply,
   replyWithImages,
   replyWithSticker,
+  sendPoll,
+  sendButtons,
+  sendAudio,
 };
 
 export default utils;

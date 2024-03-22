@@ -1,4 +1,4 @@
-import { proto } from '@whiskeysockets/baileys';
+import { proto, WAMessageContent } from '@whiskeysockets/baileys';
 
 export interface IWebMessageInfoExtended extends proto.IWebMessageInfo {
   mtype?: string;
@@ -10,9 +10,17 @@ export interface AttachmentInfo {
   type: 'video' | 'image' | 'audio';
   url?: string;
   caption?: string;
+  mimetype?: string;
 }
 
 export interface UserState {
   aiModeEnabled: boolean;
   characterId?: string;
+}
+
+export interface PollMessage {
+  body: string;
+  from: string;
+  voters: WAMessageContent;
+  type: string;
 }

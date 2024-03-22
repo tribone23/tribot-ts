@@ -1,4 +1,8 @@
-import { downloadMediaMessage, getContentType } from '@whiskeysockets/baileys';
+import {
+  downloadMediaMessage,
+  getContentType,
+  PollMessageOptions,
+} from '@whiskeysockets/baileys';
 import { IWebMessageInfoExtended } from './types.js';
 import { ipaddr } from '../commands/ip.js';
 import { helpCommand } from '../commands/help.js';
@@ -7,11 +11,17 @@ import { shell } from '../commands/shell.js';
 import { sticker } from '../commands/sticker.js';
 import { tiktok } from '../commands/tiktok.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
+import { play } from '../commands/play.js';
+import fs from 'fs';
 import utils from './utils.js';
+import path from 'path';
+import 'dotenv/config';
 
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
   const senderNumber: string = m.key.remoteJid ?? '';
   let body;
+  const owner1 = process.env.OWNER1;
+  const owner2 = process.env.OWNER2;
 
   if (m.message) {
     m.mtype = getContentType(m.message);
@@ -69,11 +79,17 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         m.args = [];
       }
 
-      const userState = await aiChatHandler(body, command, senderNumber, m.pushName);
+      const userState = await aiChatHandler(
+        body,
+        command,
+        senderNumber,
+        m.pushName,
+      );
+      const who = m.key.participant ? m.key.participant : m.key.remoteJid;
 
       switch (command) {
         case 'help':
-          await helpCommand(senderNumber, m);
+          await helpCommand(senderNumber);
           break;
         case 'p':
           console.log(m.args);
@@ -90,7 +106,16 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           break;
         case 'sh':
         case 'shell':
-          await shell(m.args, senderNumber, m);
+          if (who === owner1 || who === owner2) {
+            await shell(m.args, senderNumber, m);
+          } else {
+            const filePath = path.resolve('./src/assets/dikira_lucu.jpg');
+            const media = fs.readFileSync(filePath);
+            const vn: string =
+              'https://bucin-livid.vercel.app/audio/lusiapa.mp3';
+            await utils.sendAudio(senderNumber, vn, m);
+            await sticker(senderNumber, media, m);
+          }
           break;
         case 's':
         case 'sticker': {
@@ -104,6 +129,29 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         }
         case 'tiktok':
           await tiktok(m.args, senderNumber, m);
+          break;
+        case 'play':
+          await play(m.args, senderNumber, m);
+          break;
+        case 'button':
+          await utils.sendButtons(senderNumber, m);
+          break;
+        case 'poll':
+          console.log(m);
+          if (m.args.length > 0) {
+            const options: PollMessageOptions = {
+              name: m.args.join(' '),
+              selectableCount: 1,
+              values: ['Waduh', 'Wadah', 'Waduhh'],
+            };
+            utils.sendPoll(options, senderNumber, m);
+          } else {
+            utils.sendText(
+              'Please provide a question for the poll.',
+              senderNumber,
+            );
+          }
+
           break;
         case 'aimode': {
           userState.aiModeEnabled = true;
