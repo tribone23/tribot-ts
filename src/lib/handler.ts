@@ -1,6 +1,8 @@
-import fs from 'fs';
-import path from 'path';
-import { downloadMediaMessage, getContentType } from '@whiskeysockets/baileys';
+import {
+  downloadMediaMessage,
+  getContentType,
+  PollMessageOptions,
+} from '@whiskeysockets/baileys';
 import { IWebMessageInfoExtended } from './types.js';
 import { ipaddr } from '../commands/ip.js';
 import { helpCommand } from '../commands/help.js';
@@ -9,8 +11,10 @@ import { shell } from '../commands/shell.js';
 import { sticker } from '../commands/sticker.js';
 import { tiktok } from '../commands/tiktok.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
+import { play } from '../commands/play.js';
+import fs from 'fs';
 import utils from './utils.js';
-import tes from './tes.js';
+import path from 'path';
 import 'dotenv/config';
 
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
@@ -83,11 +87,9 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       );
       const who = m.key.participant ? m.key.participant : m.key.remoteJid;
 
-      console.log(who);
-
       switch (command) {
         case 'help':
-          await helpCommand(senderNumber, m);
+          await helpCommand(senderNumber);
           break;
         case 'p':
           console.log(m.args);
@@ -96,18 +98,18 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           await ipaddr(senderNumber);
           break;
         case 'test':
-          //utils.sendText(`testo testo dari ${m.pushName}`, senderNumber);
+          utils.sendText(`testo testo dari ${m.pushName}`, senderNumber);
           break;
         case 'speedtest':
           utils.sendText('Performing server speedtest...', senderNumber);
           await speedtest(senderNumber, m);
           break;
         case 'sh':
-        case 'shell': {
+        case 'shell':
           if (who === owner1 || who === owner2) {
             await shell(m.args, senderNumber, m);
           } else {
-            const filePath = path.resolve('./src/media/dikira_lucu.jpg');
+            const filePath = path.resolve('./src/assets/dikira_lucu.jpg');
             const media = fs.readFileSync(filePath);
             const vn: string =
               'https://bucin-livid.vercel.app/audio/lusiapa.mp3';
@@ -115,7 +117,6 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
             await sticker(senderNumber, media, m);
           }
           break;
-        }
         case 's':
         case 'sticker': {
           const media = await downloadMediaMessage(m, 'buffer', {});
@@ -128,6 +129,29 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         }
         case 'tiktok':
           await tiktok(m.args, senderNumber, m);
+          break;
+        case 'play':
+          await play(m.args, senderNumber, m);
+          break;
+        case 'button':
+          await utils.sendButtons(senderNumber, m);
+          break;
+        case 'poll':
+          console.log(m);
+          if (m.args.length > 0) {
+            const options: PollMessageOptions = {
+              name: m.args.join(' '),
+              selectableCount: 1,
+              values: ['Waduh', 'Wadah', 'Waduhh'],
+            };
+            utils.sendPoll(options, senderNumber, m);
+          } else {
+            utils.sendText(
+              'Please provide a question for the poll.',
+              senderNumber,
+            );
+          }
+
           break;
         case 'aimode': {
           userState.aiModeEnabled = true;
