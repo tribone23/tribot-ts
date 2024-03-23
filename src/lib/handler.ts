@@ -93,7 +93,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         premium: false,
         time: new Date(),
       };
-      const cek: unknown = await findData(db, 'data_user', { _id: who });
+      const cek = await findData(db, 'data_user', { _id: who });
       cek.length === 0
         ? (utils.sendText('silahkan register terlebih dahulu', senderNumber),
           await insertData(db, 'data_user', data))
