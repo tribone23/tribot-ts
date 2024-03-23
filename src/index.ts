@@ -15,8 +15,11 @@ import NodeCache from 'node-cache';
 import pollListener from './lib/listener.js';
 import handler from './lib/handler.js';
 import MAIN_LOGGER from './utils/logger.js';
+import { connectMongoDB } from './lib/mongo.js';
 // import EventEmitter from 'events';
 const { proto } = Proto;
+
+export const db = await connectMongoDB();
 
 // import MAIN_LOGGER from '@whiskeysockets/baileys/lib/Utils/logger.js';
 // export const eventEmitter = new EventEmitter();
@@ -69,6 +72,7 @@ async function triBotInitialize() {
       }
     } else if (connection === 'open') {
       console.log('opened connection');
+      // await db();
     }
   });
 
@@ -92,8 +96,8 @@ async function triBotInitialize() {
             type: 'poll',
           };
 
-      //  console.log('Emitting pollMessageReceived event with payload:', payload);
-      //  eventEmitter.emit('pollMessageReceived', payload);
+          //  console.log('Emitting pollMessageReceived event with payload:', payload);
+          //  eventEmitter.emit('pollMessageReceived', payload);
 
           await pollListener(payload);
           // console.log(payload);

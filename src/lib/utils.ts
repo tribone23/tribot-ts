@@ -3,13 +3,13 @@ import { AttachmentInfo, IWebMessageInfoExtended } from './types';
 import { sock } from '../index.js';
 
 const sendText = async (text: string, senderNumber: string): Promise<void> => {
-  await sock.sendMessage(senderNumber, { text: text});
+  await sock.sendMessage(senderNumber, { text: text });
 };
 
-const sendLink = async (text: string, senderNumber: string ): Promise<void> => {
-await sock.sendMessage(senderNumber, {
-  text: text,
-});
+const sendLink = async (text: string, senderNumber: string): Promise<void> => {
+  await sock.sendMessage(senderNumber, {
+    text: text,
+  });
 };
 
 const sendAttachment = async (
@@ -18,7 +18,7 @@ const sendAttachment = async (
   m: IWebMessageInfoExtended,
 ) => {
   const { type, url, caption, mimetype } = attachmentInfo;
-  console.log(url, caption, type)
+  console.log(url, caption, type);
 
   if (type === 'video') {
     await sock.sendMessage(
@@ -27,18 +27,15 @@ const sendAttachment = async (
       { quoted: m },
     );
   } else if (type === 'image') {
-    await sock.sendMessage(
-      senderNumber,
-      { caption: caption || 'Nyo Gambare', image: { url: url ?? '' } },
-    );
+    await sock.sendMessage(senderNumber, {
+      caption: caption || 'Nyo Gambare',
+      image: { url: url ?? '' },
+    });
   } else if (type === 'audio') {
-  await sock.sendMessage(
-    senderNumber,
-    {
+    await sock.sendMessage(senderNumber, {
       audio: { url: url ?? '' },
       mimetype: mimetype ?? 'audio/mp4',
-    },
-  );
+    });
   } else {
     console.log('kapan kapan');
   }
@@ -110,7 +107,11 @@ const sendAudio = async (
 ): Promise<void> => {
   await sock.sendMessage(
     senderNumber,
-    { audio: { url: url ?? '' }, mimetype: mimetype ?? 'audio/mp4', caption: 'Nyo audione'},
+    {
+      audio: { url: url ?? '' },
+      mimetype: mimetype ?? 'audio/mp4',
+      caption: 'Nyo audione',
+    },
     { quoted: m },
   );
 };

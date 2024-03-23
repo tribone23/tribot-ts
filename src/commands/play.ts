@@ -24,7 +24,9 @@ export async function play(
       waitForAnswer = true;
       const result = await yts.search(query.join(' '));
       // console.log(result);
-      const title = result.videos.slice(0, 5).map((video) => `${video.title} [${video.timestamp}]`);
+      const title = result.videos
+        .slice(0, 5)
+        .map((video) => `${video.title} [${video.timestamp}]`);
 
       const options: PollMessageOptions = {
         name: `🗣️ Result for ${query.join(' ')}`,

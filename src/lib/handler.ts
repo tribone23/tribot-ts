@@ -16,7 +16,8 @@ import fs from 'fs';
 import utils from './utils.js';
 import path from 'path';
 import 'dotenv/config';
-
+import { insertData, findData } from './mongo.js';
+import { db } from '../index.js';
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
   const senderNumber: string = m.key.remoteJid ?? '';
   let body;
@@ -86,6 +87,17 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         m.pushName,
       );
       const who = m.key.participant ? m.key.participant : m.key.remoteJid;
+      const data = {
+        _id: who,
+        nama: m.pushName,
+        premium: false,
+        time: new Date(),
+      };
+      const cek: unknown = await findData(db, 'data_user', { _id: who });
+      cek.length === 0
+        ? (utils.sendText('silahkan register terlebih dahulu', senderNumber),
+          await insertData(db, 'data_user', data))
+        : console.log('data sudah ada');
 
       switch (command) {
         case 'help':
