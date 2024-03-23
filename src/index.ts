@@ -92,10 +92,10 @@ async function triBotInitialize() {
             type: 'poll',
           };
 
-      //  console.log('Emitting pollMessageReceived event with payload:', payload);
-      //  eventEmitter.emit('pollMessageReceived', payload);
+          //  console.log('Emitting pollMessageReceived event with payload:', payload);
+          //  eventEmitter.emit('pollMessageReceived', payload);
 
-          await pollListener(payload);
+          await pollListener(key.remoteJid!, payload);
           // console.log(payload);
         }
       }
