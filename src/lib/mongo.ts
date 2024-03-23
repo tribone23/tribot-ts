@@ -61,11 +61,7 @@ export async function insertData(
  * $type mencocokan dokumen yang memiliki type field tersebut
  **/
 
-export async function findData(
-  db: Db,
-  Collection: string,
-  q: object,
-): Promise<unknown> {
+export async function findData(db: Db, Collection: string, q: object) {
   const collection = db.collection(Collection);
   try {
     const find = await collection.find(q).toArray();
