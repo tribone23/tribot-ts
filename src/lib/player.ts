@@ -19,8 +19,10 @@ export default async function ytPlayer(
     };
 
     const thumbnail = info.videoDetails.thumbnails[0].url;
+    console.log(data);
 
-    utils.sendAttachment(data, senderNumber, m);
+    utils.sendAudio(senderNumber, format.url, m);
+    // utils.sendAttachment(data, senderNumber, m);
     utils.replyWithImages(
       `✨ Now playing ${info.videoDetails.title}\n🕐 ${duration}`,
       thumbnail,

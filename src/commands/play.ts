@@ -6,12 +6,12 @@ import ytPlayer from '../lib/player.js';
 import EventEmitter from 'node-cache';
 
 const eventEmitter = new EventEmitter();
-let waitForAnswer = false;
+const waitForAnswer = new Map<string, boolean>();
 
-export async function userAnswer(answer: string) {
+export async function userAnswer(senderNumber: string, answer: string) {
+  eventEmitter.emit(senderNumber, answer);
   // console.log(answer);
   // emit event dari jawaban e
-  eventEmitter.emit('pollMessageReceived', answer);
 }
 
 export async function play(
@@ -19,12 +19,19 @@ export async function play(
   senderNumber: string,
   m: IWebMessageInfoExtended,
 ) {
-  if (!waitForAnswer) {
+  if (waitForAnswer.get(senderNumber) === undefined) {
+    waitForAnswer.set(senderNumber, false);
+  }
+
+  if (waitForAnswer.get(senderNumber) === false) {
     if (query.length > 0) {
-      waitForAnswer = true;
+      waitForAnswer.set(senderNumber, true);
+      console.log(waitForAnswer.get(senderNumber));
       const result = await yts.search(query.join(' '));
       // console.log(result);
-      const title = result.videos.slice(0, 5).map((video) => `${video.title} [${video.timestamp}]`);
+      const title = result.videos
+        .slice(0, 5)
+        .map((video) => `${video.title} [${video.timestamp}]`);
 
       const options: PollMessageOptions = {
         name: `🗣️ Result for ${query.join(' ')}`,
@@ -34,13 +41,23 @@ export async function play(
 
       await utils.sendPoll(options, senderNumber, m);
 
+      // // console.log(answer);
+      setTimeout(() => {
+        // lek user gak njawab 20 detik lanjut
+        console.log('ganok');
+        waitForAnswer.set(senderNumber, false);
+      }, 20000);
+
       const answer = await new Promise<string>((resolve) => {
         const listener = (payload: string) => {
           resolve(payload);
-          eventEmitter.off('pollMessageReceived', listener);
+          eventEmitter.off(senderNumber, listener);
         };
-        eventEmitter.on('pollMessageReceived', listener);
+        eventEmitter.on(senderNumber, listener);
       });
+
+      console.log("saiki kondisine", waitForAnswer.get(senderNumber));
+      console.log(answer);
 
       const choosen = title.indexOf(answer);
       const link = result.videos[choosen].url;
@@ -51,7 +68,7 @@ export async function play(
 
       // console.log('onok event', answer);
 
-      waitForAnswer = false;
+      waitForAnswer.set(senderNumber, false);
     }
   }
 }
