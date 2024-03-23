@@ -87,18 +87,22 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         m.pushName,
       );
       const who = m.key.participant ? m.key.participant : m.key.remoteJid;
+
       const data = {
         _id: who,
         nama: m.pushName,
         premium: false,
         time: new Date(),
       };
+
       const cek = await findData(db, 'data_user', { _id: who });
+
       if (cek && cek.length === 0) {
         utils.sendText('silahkan register terlebih dahulu', senderNumber);
         await insertData(db, 'data_user', data);
       } else {
         console.log('data sudah ada');
+        console.log(cek);
       }
 
       switch (command) {
@@ -150,6 +154,11 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         case 'button':
           await utils.sendButtons(senderNumber, m);
           break;
+        case 'whoami': {
+          const cekString = cek?.map((item) => JSON.stringify(item)).join('\n');
+          utils.sendText(cekString || 'No data', senderNumber);
+          break;
+        }
         case 'poll':
           console.log(m);
           if (m.args.length > 0) {
