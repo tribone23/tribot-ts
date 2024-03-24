@@ -16,8 +16,8 @@ const sendLink = async (
     text: text,
     contextInfo: {
       externalAdReply: {
-        title: '23 Maret 2024',
-        body: '© izumi-bot delta v1.0.2',
+        title: new Date().toLocaleString(),
+        body: '© tribot-ts staging version',
         mediaType: 1,
         thumbnailUrl: thumbnail,
         sourceUrl: sourceurl,
