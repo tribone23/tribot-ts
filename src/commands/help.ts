@@ -18,9 +18,8 @@ export async function helpCommand(senderNumber: string) {
     'play',
   ];
 
-  const url = 'https://tribone.my.id';
   const usage = `*Usage*\n[prefix](command)\n\n-- _Example_ --:\n\`\`\`${prefix}${commandList[2]}\`\`\`\n`;
-  const text = `Welcome, folks! 🔖\nWhat can i do for you today?\n\n${helpCmd}\n\n*Commands List*\n\`\`\`${commandList}\`\`\`\n\n${usage}\n\n\`\`\`Development by tribone23\`\`\`\n${url}`;
+  const text = `Welcome, folks! 🔖\nWhat can i do for you today?\n\n${helpCmd}\n\n*Commands List*\n\`\`\`${commandList}\`\`\`\n\n${usage}\n\n\`\`\`Development by tribone23\`\`\`\n`;
 
   // const linkPreview = await getUrlInfo('https://github.com', {
   //   thumbnailWidth: 1024,

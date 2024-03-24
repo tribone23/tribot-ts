@@ -154,6 +154,9 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         case 'button':
           await utils.sendButtons(senderNumber, m);
           break;
+        case 'link':
+          await utils.sendLink(m.args.join(' '), senderNumber);
+          break;
         case 'whoami': {
           const cekString = cek?.map((item) => JSON.stringify(item)).join('\n');
           utils.sendText(cekString || 'No data', senderNumber);

@@ -9,6 +9,16 @@ const sendText = async (text: string, senderNumber: string): Promise<void> => {
 const sendLink = async (text: string, senderNumber: string): Promise<void> => {
   await sock.sendMessage(senderNumber, {
     text: text,
+    contextInfo: {
+      externalAdReply: {
+        title: `24 Maret 2024`,
+        body: `© tribot-ts @tribone23`,
+        renderLargerThumbnail: true,
+        thumbnailUrl:
+          'https://raw.githubusercontent.com/tribone23/tribot-ts/dev/src/assets/thumbnail.png',
+        sourceUrl: 'https://github.com/tribone23',
+      },
+    },
   });
 };
 
