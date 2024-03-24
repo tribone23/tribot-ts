@@ -13,9 +13,9 @@ const sendLink = async (text: string, senderNumber: string): Promise<void> => {
       externalAdReply: {
         title: `24 Maret 2024`,
         body: `© tribot-ts @tribone23`,
-        renderLargerThumbnail: true,
+        // renderLargerThumbnail: true,
         thumbnailUrl:
-          'https://raw.githubusercontent.com/tribone23/tribot-ts/dev/src/assets/thumbnail.png',
+          'https://raw.githubusercontent.com/tribone23/tribot-ts/dev/src/assets/thumbnail.jpg',
         sourceUrl: 'https://github.com/tribone23',
       },
     },
