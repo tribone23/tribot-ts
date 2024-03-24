@@ -7,17 +7,39 @@ const sendText = async (text: string, senderNumber: string): Promise<void> => {
 };
 
 const sendLink = async (text: string, senderNumber: string): Promise<void> => {
+  // const pp = await fetch(
+  //   'https://raw.githubusercontent.com/tribone23/tribot-ts/dev/src/assets/thumbnail.jpg',
+  // );
+  // const ppArrayBuffer = await pp.arrayBuffer();
+  // const ppUint8Array = new Uint8Array(ppArrayBuffer);
   await sock.sendMessage(senderNumber, {
     text: text,
     contextInfo: {
       externalAdReply: {
-        title: `24 Maret 2024`,
-        body: `© tribot-ts @tribone23`,
-        // renderLargerThumbnail: true,
+        title: '23 Maret 2024',
+        body: '© izumi-bot delta v1.0.2',
+        mediaType: 1,
         thumbnailUrl:
-          'https://raw.githubusercontent.com/tribone23/tribot-ts/dev/src/assets/thumbnail.jpg',
-        sourceUrl: 'https://github.com/tribone23',
+          'https://cdn.jsdelivr.net/gh/dhanifitrah/STOK-IZUMI/PAGE-IZUMIBOT.jpg',
+        sourceUrl: 'https://www.whatsapp.com/channel/0029VaOQ8kVDTkK5ZQwEHE1H',
+        containsAutoReply: false,
+        renderLargerThumbnail: true,
+        showAdAttribution: false,
       },
+
+      // await sock.sendMessage(senderNumber, {
+      //   text: text,
+      //   contextInfo: {
+      //     externalAdReply : {
+      //     title: '23 Maret 2024',
+      //     body: '© izumi-bot delta v1.0.2',
+      //     mediaType: 1,
+      //     thumbnailUrl: 'https://cdn.jsdelivr.net/gh/dhanifitrah/STOK-IZUMI/PAGE-IZUMIBOT.jpg',
+      //     thumbnail: <Buffer>,
+      //     sourceUrl: 'https://www.whatsapp.com/channel/0029VaOQ8kVDTkK5ZQwEHE1H',
+      //     containsAutoReply: false,
+      //     renderLargerThumbnail: true,
+      //     showAdAttribution: false
     },
   });
 };
