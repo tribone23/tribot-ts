@@ -104,7 +104,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
 
       switch (command) {
         case 'help':
-          await helpCommand(senderNumber);
+          await helpCommand(senderNumber, m);
           break;
         case 'p':
           console.log(m.args);
