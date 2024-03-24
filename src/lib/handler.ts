@@ -100,9 +100,6 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       if (cek && cek.length === 0) {
         utils.sendText('silahkan register terlebih dahulu', senderNumber);
         await insertData(db, 'data_user', data);
-      } else {
-        console.log('data sudah ada');
-        console.log(cek);
       }
 
       switch (command) {
