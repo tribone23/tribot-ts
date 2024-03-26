@@ -15,8 +15,6 @@ const sendLink = async (
   await sock.sendMessage(senderNumber, {
     text: text,
     contextInfo: {
-      forwardingScore: 555,
-      isForwarded: true,
       externalAdReply: {
         title: new Date().toLocaleString(),
         body: '© tribot-ts staging version',
