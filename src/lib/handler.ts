@@ -112,6 +112,16 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         case 'ip':
           await ipaddr(senderNumber);
           break;
+        case 'forward1': {
+          const q: string = m.args.join(' ');
+          utils.sendForward(senderNumber, q, true);
+          break;
+        }
+        case 'forward2': {
+          const q: string = m.args.join(' ');
+          utils.sendForward(senderNumber, q, false);
+          break;
+        }
         case 'test':
           utils.sendText(`testo testo dari ${m.pushName}`, senderNumber);
           break;

@@ -15,6 +15,8 @@ const sendLink = async (
   await sock.sendMessage(senderNumber, {
     text: text,
     contextInfo: {
+      forwardingScore: 555,
+      isForwarded: true,
       externalAdReply: {
         title: new Date().toLocaleString(),
         body: '© tribot-ts staging version',
@@ -56,6 +58,21 @@ const sendAttachment = async (
   } else {
     console.log('kapan kapan');
   }
+};
+
+const sendForward = async (
+  senderNumber: string,
+  text: string,
+  forwading: boolean | number,
+): Promise<void> => {
+  forwading == true ? (forwading = 555) : (forwading = 55);
+  await sock.sendMessage(senderNumber, {
+    text: text,
+    contextInfo: {
+      forwardingScore: forwading,
+      isForwarded: true,
+    },
+  });
 };
 
 const reply = async (
@@ -143,6 +160,7 @@ const utils = {
   sendPoll,
   sendButtons,
   sendAudio,
+  sendForward,
 };
 
 export default utils;
