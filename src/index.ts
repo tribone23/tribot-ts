@@ -47,6 +47,7 @@ export const sock = makeWASocket({
     keys: makeCacheableSignalKeyStore(state.keys, logger),
   },
   generateHighQualityLinkPreview: true,
+  defaultQueryTimeoutMs: 0,
   msgRetryCounterCache,
   getMessage,
 });
