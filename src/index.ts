@@ -35,27 +35,27 @@ setInterval(() => {
   store?.writeToFile('auth/baileys_store_multi.json');
 }, 10_000);
 
-const { state, saveCreds } = await useMultiFileAuthState('auth');
-const { version } = await fetchLatestBaileysVersion();
-
-export const sock = makeWASocket({
-  version,
-  logger,
-  printQRInTerminal: true,
-  auth: {
-    creds: state.creds,
-    keys: makeCacheableSignalKeyStore(state.keys, logger),
-  },
-  generateHighQualityLinkPreview: true,
-  defaultQueryTimeoutMs: undefined,
-  syncFullHistory: false,
-  msgRetryCounterCache,
-  getMessage,
-});
-
-store?.bind(sock.ev);
-
 async function triBotInitialize() {
+  const { state, saveCreds } = await useMultiFileAuthState('auth');
+  const { version } = await fetchLatestBaileysVersion();
+
+  const sock = makeWASocket({
+    version,
+    logger,
+    printQRInTerminal: true,
+    auth: {
+      creds: state.creds,
+      keys: makeCacheableSignalKeyStore(state.keys, logger),
+    },
+    generateHighQualityLinkPreview: true,
+    defaultQueryTimeoutMs: undefined,
+    syncFullHistory: false,
+    msgRetryCounterCache,
+    getMessage,
+  });
+
+  store?.bind(sock.ev);
+
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect } = update;
     if (connection === 'close') {
@@ -166,6 +166,8 @@ async function triBotInitialize() {
       }
     });
   });
+
+  return sock;
 }
 
 async function getMessage(
@@ -179,4 +181,4 @@ async function getMessage(
   return proto.Message.fromObject({});
 }
 
-triBotInitialize();
+export const sock = await triBotInitialize();
