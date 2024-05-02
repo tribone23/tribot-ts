@@ -1,26 +1,13 @@
-FROM node as builder
+FROM node:18-alpine3.18
 
-# Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Install app dependencies
 COPY package*.json ./
+
+RUN npm install
 
 COPY . .
 
 RUN npm run build
 
-FROM node:slim
-
-ENV NODE_ENV production
-USER node
-
-# Create app directory
-WORKDIR /usr/src/app
-
-# Install app dependencies
-COPY package*.json ./
-
-COPY --from=builder /usr/src/app/dist ./dist
-
-CMD [ "node", "dist/index.js" ]
+CMD ["node", "dist/index.js"]

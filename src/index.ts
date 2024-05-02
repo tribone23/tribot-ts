@@ -35,24 +35,24 @@ setInterval(() => {
   store?.writeToFile('auth/baileys_store_multi.json');
 }, 10_000);
 
-async function triBotInitialize() {
-  const { state, saveCreds } = await useMultiFileAuthState('auth');
-  const { version } = await fetchLatestBaileysVersion();
+const { state, saveCreds } = await useMultiFileAuthState('auth');
+const { version } = await fetchLatestBaileysVersion();
 
-  const sock = makeWASocket({
-    version,
-    logger,
-    printQRInTerminal: true,
-    auth: {
-      creds: state.creds,
-      keys: makeCacheableSignalKeyStore(state.keys, logger),
-    },
-    generateHighQualityLinkPreview: true,
-    defaultQueryTimeoutMs: undefined,
-    syncFullHistory: false,
-    msgRetryCounterCache,
-    getMessage,
-  });
+async function triBotInitialize() {
+const sock = makeWASocket({
+  version,
+  logger,
+  printQRInTerminal: true,
+  auth: {
+    creds: state.creds,
+    keys: makeCacheableSignalKeyStore(state.keys, logger),
+  },
+  generateHighQualityLinkPreview: true,
+  defaultQueryTimeoutMs: undefined,
+  syncFullHistory: false,
+  msgRetryCounterCache,
+  getMessage,
+});
 
   store?.bind(sock.ev);
 
