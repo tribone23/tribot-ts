@@ -35,10 +35,10 @@ setInterval(() => {
   store?.writeToFile('auth/baileys_store_multi.json');
 }, 10_000);
 
+async function triBotInitialize() {
 const { state, saveCreds } = await useMultiFileAuthState('auth');
 const { version } = await fetchLatestBaileysVersion();
 
-async function triBotInitialize() {
 const sock = makeWASocket({
   version,
   logger,
@@ -58,23 +58,20 @@ const sock = makeWASocket({
 
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect } = update;
-    if (connection === 'close') {
-      const shouldReconnect =
-        (lastDisconnect?.error as Boom)?.output?.statusCode !==
-        DisconnectReason.loggedOut;
-      console.log(
-        'connection closed due to ',
-        lastDisconnect?.error,
-        ', reconnecting ',
-        shouldReconnect,
-      );
-      // reconnect nek gak login
-      if (shouldReconnect) {
-        triBotInitialize();
-      }
+
+    if (connection === "close") {
+				if (
+					lastDisconnect &&
+					lastDisconnect.error &&
+					lastDisconnect.error.output &&
+					lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut
+				) {
+					triBotInitialize();
+				} else {
+					console.log("Connection closed. You are logged out.");
+        }
     } else if (connection === 'open') {
       console.log('opened connection');
-      // await db();
     }
   });
 
