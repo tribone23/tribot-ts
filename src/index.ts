@@ -60,15 +60,15 @@ const sock = makeWASocket({
     const { connection, lastDisconnect } = update;
 
     if (connection === "close") {
-				if (
-					lastDisconnect &&
-					lastDisconnect.error &&
-					lastDisconnect.error.output &&
-					lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut
-				) {
-					triBotInitialize();
-				} else {
-					console.log("Connection closed. You are logged out.");
+	if (
+	lastDisconnect &&
+	lastDisconnect.error &&
+	lastDisconnect.error.output &&
+	lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut
+	) {
+	triBotInitialize();
+	} else {
+	console.log("Connection closed. You are logged out.");
         }
     } else if (connection === 'open') {
       console.log('opened connection');
