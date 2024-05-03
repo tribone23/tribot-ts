@@ -62,9 +62,9 @@ const sock = makeWASocket({
     if (connection === "close") {
 	if (
 	lastDisconnect &&
-	lastDisconnect?.error &&
-	lastDisconnect?.error?.output &&
-	lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut
+	(lastDisconnect?.error as Boom?) &&
+	(lastDisconnect?.error as Boom?).output &&
+	(lastDisconnect?.error as Boom?).output?.statusCode !== DisconnectReason.loggedOut
 	) {
 	triBotInitialize();
 	} else {
