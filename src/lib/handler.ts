@@ -192,6 +192,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           }
           break;
         }
+        case 'tt':
         case 'tiktok':
           await tiktok(m.args, senderNumber, m);
           break;
