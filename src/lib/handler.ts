@@ -12,6 +12,7 @@ import { sticker } from '../commands/sticker.js';
 import { tiktok } from '../commands/tiktok.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import { play } from '../commands/play.js';
+import { sock } from '../index.js';
 import fs from 'fs';
 import utils from './utils.js';
 import path from 'path';
@@ -20,6 +21,13 @@ import { insertData, findData } from './mongo.js';
 import { db } from '../index.js';
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
   const senderNumber: string = m.key.remoteJid ?? '';
+  const groupMetadata = await sock.groupMetadata(senderNumber).catch(() => {});
+  const isGroup = senderNumber.endsWith('@g.us');
+  const groupMembers =
+    isGroup && groupMetadata && groupMetadata.participants
+      ? groupMetadata.participants
+      : [];
+
   let body;
   const owner1 = process.env.OWNER1;
   const owner2 = process.env.OWNER2;
@@ -101,8 +109,40 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         utils.sendText('silahkan register terlebih dahulu', senderNumber);
         await insertData(db, 'data_user', data);
       }
-
+      const q = m.args.join(' ');
       switch (command) {
+        case 'jodohku':
+          {
+            const member = groupMembers.map((i) => i.id);
+            console.log(member);
+            const jodo = member[Math.floor(Math.random() * member.length)];
+            console.log(jodo);
+            const jawab = `jodo kamu adalah @${
+              jodo.split('@')[0]
+            }\nsegera ke KUA sukolilo ya`;
+            const mentions = [jodo];
+            sock.sendMessage(
+              senderNumber,
+              { text: jawab, mentions: mentions },
+              { quoted: m },
+            );
+          }
+          break;
+        case 'hidetag':
+        case 'pengumuman':
+          {
+            const member: Array<string> = [];
+            // console.log('groupMetadata ' + typeof groupMetadata);
+            // console.log('isGroup ' + typeof isGroup);
+            // console.log('groupMembers ' + typeof groupMembers);
+            // console.log(groupMetadata.participants);
+            groupMembers.map((i) => member.push(i.id));
+            sock.sendMessage(senderNumber, {
+              text: q ? q : 'test',
+              mentions: member,
+            });
+          }
+          break;
         case 'help':
           await helpCommand(senderNumber, m);
           break;

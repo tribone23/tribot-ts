@@ -36,40 +36,42 @@ setInterval(() => {
 }, 10_000);
 
 async function triBotInitialize() {
-const { state, saveCreds } = await useMultiFileAuthState('auth');
-const { version } = await fetchLatestBaileysVersion();
-
-const sock = makeWASocket({
-  version,
-  logger,
-  printQRInTerminal: true,
-  auth: {
-    creds: state.creds,
-    keys: makeCacheableSignalKeyStore(state.keys, logger),
-  },
-  generateHighQualityLinkPreview: true,
-  defaultQueryTimeoutMs: undefined,
-  syncFullHistory: false,
-  msgRetryCounterCache,
-  getMessage,
-});
+  const { state, saveCreds } = await useMultiFileAuthState('auth');
+  const { version } = await fetchLatestBaileysVersion();
+  let sumReconnect: number = 0;
+  const sock = makeWASocket({
+    version,
+    logger,
+    printQRInTerminal: true,
+    auth: {
+      creds: state.creds,
+      keys: makeCacheableSignalKeyStore(state.keys, logger),
+    },
+    generateHighQualityLinkPreview: true,
+    defaultQueryTimeoutMs: undefined,
+    syncFullHistory: false,
+    msgRetryCounterCache,
+    getMessage,
+  });
 
   store?.bind(sock.ev);
 
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect } = update;
-
-    if (connection === "close") {
-	if (
-	lastDisconnect &&
-	(lastDisconnect?.error as Boom) &&
-	(lastDisconnect?.error as Boom)?.output &&
-	(lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut
-	) {
-	triBotInitialize();
-	} else {
-	console.log("Connection closed. You are logged out.");
-        }
+    if (connection === 'close') {
+      if (
+        lastDisconnect &&
+        (lastDisconnect?.error as Boom) &&
+        (lastDisconnect?.error as Boom)?.output &&
+        (lastDisconnect?.error as Boom)?.output?.statusCode !==
+          DisconnectReason.loggedOut
+      ) {
+        sumReconnect++;
+        console.log('reconnect yang ke ', sumReconnect);
+        triBotInitialize();
+      } else {
+        console.log('Connection closed. You are logged out.');
+      }
     } else if (connection === 'open') {
       console.log('opened connection');
     }
