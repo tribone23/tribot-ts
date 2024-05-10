@@ -31,6 +31,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
   let body;
   const owner1 = process.env.OWNER1;
   const owner2 = process.env.OWNER2;
+  const ownnumber = process.env.BOTNUMBER;
 
   if (m.message) {
     m.mtype = getContentType(m.message);
@@ -93,9 +94,14 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         command,
         senderNumber,
         m.pushName,
+        m.key.remoteJid,
+        ownnumber,
       );
+
       const who = m.key.participant ? m.key.participant : m.key.remoteJid;
 
+      /* 
+      WIP - Work in Progress
       const data = {
         _id: who,
         nama: m.pushName,
@@ -108,7 +114,8 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       if (cek && cek.length === 0) {
         utils.sendText('silahkan register terlebih dahulu', senderNumber);
         await insertData(db, 'data_user', data);
-      }
+      } */
+
       const q = m.args.join(' ');
       switch (command) {
         case 'jodohku':
@@ -203,6 +210,20 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           await utils.sendButtons(senderNumber, m);
           break;
         case 'whoami': {
+          const data = {
+            _id: who,
+            nama: m.pushName,
+            premium: false,
+            time: new Date(),
+          };
+
+          const cek = await findData(db, 'data_user', { _id: who });
+
+          if (cek && cek.length === 0) {
+            utils.sendText('silahkan register terlebih dahulu', senderNumber);
+            await insertData(db, 'data_user', data);
+          }
+
           const cekString = cek?.map((item) => JSON.stringify(item)).join('\n');
           utils.sendText(cekString || 'No data', senderNumber);
           break;

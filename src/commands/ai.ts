@@ -1,6 +1,14 @@
 import { UserState } from '../lib/types.js';
-import { ApiResponseAi, checkCharId, chatWithAi } from '../lib/ai.js';
+import {
+  ApiResponseAi,
+  checkCharId,
+  getCharImage,
+  chatWithAi,
+  getBufferFromUrl,
+} from '../lib/ai.js';
+import { sock } from '../index.js';
 import utils from '../lib/utils.js';
+import 'dotenv/config';
 
 export const aiModeUsers = new Map<string, UserState>();
 
@@ -9,7 +17,11 @@ export async function aiChatHandler(
   command: string | undefined,
   senderNumber: string,
   senderName: string | null | undefined,
+  remoteJid: string | null | undefined,
+  ownnumber: string | undefined,
 ) {
+
+  const ownJid = ownnumber || remoteJid;
   const userState = aiModeUsers.get(senderNumber) ?? {
     aiModeEnabled: false,
   };
@@ -51,6 +63,23 @@ export async function aiChatHandler(
               `ID Character berhasil tersimpan, session started with *${characterStatus[0].body}*\n\n[-] \`\`\`/reset /exit\`\`\`\n`,
               senderNumber,
             );
+
+            const characterImage: ApiResponseAi =
+              await getCharImage(characterId);
+
+            if (characterImage[0].status == 'success') {
+              try {
+                await sock.updateProfileName(characterStatus[0].body);
+                const imageUrl = `https://characterai.io/i/400/static/avatars/${characterImage[0].body}`;
+
+                await sock.updateProfilePicture(
+                  ownJid as string,
+                  await getBufferFromUrl(imageUrl),
+                );
+              } catch (e) {
+                console.log("[x] Failed to set profile info for AI character, ignoring...\n", e);
+              }
+            }
           } else {
             utils.sendText(
               `Gagal membuat sesi chat, masukkan kembali Character ID yang benar\n\n[ERR] \`\`\`/exit\`\`\`\nuntuk keluar dari mode AI\n`,
