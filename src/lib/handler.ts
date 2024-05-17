@@ -17,8 +17,8 @@ import fs from 'fs';
 import utils from './utils.js';
 import path from 'path';
 import 'dotenv/config';
-import { insertData, findData } from './mongo.js';
-import { db } from '../index.js';
+// import { insertData, findData } from './mongo.js';
+// import { db } from '../index.js';
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
   const senderNumber: string = m.key.remoteJid ?? '';
   const groupMetadata = await sock.groupMetadata(senderNumber).catch(() => {});
@@ -209,25 +209,25 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         case 'button':
           await utils.sendButtons(senderNumber, m);
           break;
-        case 'whoami': {
-          const data = {
-            _id: who,
-            nama: m.pushName,
-            premium: false,
-            time: new Date(),
-          };
+        // case 'whoami': {
+        //   const data = {
+        //     _id: who,
+        //     nama: m.pushName,
+        //     premium: false,
+        //     time: new Date(),
+        //   };
 
-          const cek = await findData(db, 'data_user', { _id: who });
+        //   const cek = await findData(db, 'data_user', { _id: who });
 
-          if (cek && cek.length === 0) {
-            utils.sendText('silahkan register terlebih dahulu', senderNumber);
-            await insertData(db, 'data_user', data);
-          }
+        //   if (cek && cek.length === 0) {
+        //     utils.sendText('silahkan register terlebih dahulu', senderNumber);
+        //     await insertData(db, 'data_user', data);
+        //   }
 
-          const cekString = cek?.map((item) => JSON.stringify(item)).join('\n');
-          utils.sendText(cekString || 'No data', senderNumber);
-          break;
-        }
+        //   const cekString = cek?.map((item) => JSON.stringify(item)).join('\n');
+        //   utils.sendText(cekString || 'No data', senderNumber);
+        //   break;
+        // }
         case 'poll':
           console.log(m);
           if (m.args.length > 0) {
