@@ -15,11 +15,9 @@ import NodeCache from 'node-cache';
 import pollListener from './lib/listener.js';
 import handler from './lib/handler.js';
 import MAIN_LOGGER from './utils/logger.js';
-// import EventEmitter from 'events';
+
 const { proto } = Proto;
 
-// import MAIN_LOGGER from '@whiskeysockets/baileys/lib/Utils/logger.js';
-// export const eventEmitter = new EventEmitter();
 const logger = MAIN_LOGGER.child({});
 logger.level = 'info';
 
@@ -32,43 +30,49 @@ setInterval(() => {
   store?.writeToFile('auth/baileys_store_multi.json');
 }, 10_000);
 
-const { state, saveCreds } = await useMultiFileAuthState('auth');
-const { version } = await fetchLatestBaileysVersion();
+async function triBotInitialize(reconnectAttempt = 0) {
+  const { state, saveCreds } = await useMultiFileAuthState('auth');
+  const { version } = await fetchLatestBaileysVersion();
+  const maxReconnectAttempts = 5;
+  const reconnectDelay = 5000; 
 
-export const sock = makeWASocket({
-  version,
-  logger,
-  printQRInTerminal: true,
-  auth: {
-    creds: state.creds,
-    keys: makeCacheableSignalKeyStore(state.keys, logger),
-  },
-  generateHighQualityLinkPreview: true,
-  msgRetryCounterCache,
-  getMessage,
-});
+  const sock = makeWASocket({
+    version,
+    logger,
+    printQRInTerminal: true,
+    auth: {
+      creds: state.creds,
+      keys: makeCacheableSignalKeyStore(state.keys, logger),
+    },
+    generateHighQualityLinkPreview: true,
+    defaultQueryTimeoutMs: undefined,
+    syncFullHistory: false,
+    msgRetryCounterCache,
+    getMessage,
+  });
 
-store?.bind(sock.ev);
+  store?.bind(sock.ev);
 
-async function triBotInitialize() {
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect } = update;
     if (connection === 'close') {
       const shouldReconnect =
-        (lastDisconnect?.error as Boom)?.output?.statusCode !==
-        DisconnectReason.loggedOut;
-      console.log(
-        'connection closed due to ',
-        lastDisconnect?.error,
-        ', reconnecting ',
-        shouldReconnect,
-      );
-      // reconnect nek gak login
-      if (shouldReconnect) {
-        triBotInitialize();
+        lastDisconnect &&
+        (lastDisconnect.error as Boom)?.output?.statusCode !==
+          DisconnectReason.loggedOut;
+
+      if (shouldReconnect && reconnectAttempt < maxReconnectAttempts) {
+        console.log(`Reconnect attempt #${reconnectAttempt + 1}`);
+        setTimeout(() => {
+          triBotInitialize(reconnectAttempt + 1);
+        }, reconnectDelay);
+      } else {
+        console.log(
+          'Connection closed. You are logged out or max attempts reached.',
+        );
       }
     } else if (connection === 'open') {
-      console.log('opened connection');
+      console.log('Opened connection');
     }
   });
 
@@ -92,55 +96,20 @@ async function triBotInitialize() {
             type: 'poll',
           };
 
-      //  console.log('Emitting pollMessageReceived event with payload:', payload);
-      //  eventEmitter.emit('pollMessageReceived', payload);
-
           await pollListener(payload);
-          // console.log(payload);
         }
       }
     }
   });
 
-  // sock.ev.process(
-  //   // events is a map for event name => event data
-  //   async (events) => {
-  //     if (events['messages.update']) {
-  //       console.log(JSON.stringify(events['messages.update'], undefined, 2));
-
-  //       for (const { key, update } of events['messages.update']) {
-  //         if (update.pollUpdates) {
-  //           console.log(
-  //             'onnokkkkk poll update',
-  //             update.pollUpdates,
-  //             'dan keyyyyy',
-  //             key,
-  //           );
-  //           const pollCreation = await getMessage(key);
-  //           console.log('pollll nggawe', pollCreation);
-  //           if (pollCreation) {
-  //             console.log(
-  //               'got poll update, aggregation: ',
-  //               getAggregateVotesInPollMessage({
-  //                 message: pollCreation,
-  //                 pollUpdates: update.pollUpdates,
-  //               }),
-  //             );
-  //           }
-  //         }
-  //       }
-  //     }
-  //   },
-  // );
-
   sock.ev.on('messages.upsert', async (m) => {
-    m.messages.forEach(async (message) => {
+    for (const message of m.messages) {
       if (
         !message.message ||
         message.key.fromMe ||
-        (message.key && message.key.remoteJid == 'status@broadcast')
+        (message.key && message.key.remoteJid === 'status@broadcast')
       )
-        return;
+        continue;
 
       if (message.message.ephemeralMessage) {
         message.message = message.message.ephemeralMessage.message;
@@ -150,7 +119,7 @@ async function triBotInitialize() {
         await sock.sendPresenceUpdate('composing', message.key.remoteJid!);
         await handler(message);
       } catch (error) {
-        let errMsg = 'Terdapat error ketika mengupdate presence';
+        let errMsg = 'Error when updating presence';
         if (error instanceof Error) {
           errMsg = error.message;
         }
@@ -158,8 +127,10 @@ async function triBotInitialize() {
       } finally {
         await sock.sendPresenceUpdate('available', message.key.remoteJid!);
       }
-    });
+    }
   });
+
+  return sock;
 }
 
 async function getMessage(
@@ -173,4 +144,4 @@ async function getMessage(
   return proto.Message.fromObject({});
 }
 
-triBotInitialize();
+export const sock = await triBotInitialize();

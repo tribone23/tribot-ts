@@ -10,7 +10,41 @@ export type ApiResponseAi = Response[];
 export async function checkCharId(charid: string): Promise<ApiResponseAi> {
   try {
     const { data } = await axios.get<Response[]>(
-      `http://localhost:8080/ai?charid=${charid}`,
+      `http://localhost:8080/ai?charid=${encodeURIComponent(charid)}`,
+    );
+
+    const result = data;
+
+    return result;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log('[ERROR] Axios: ', error.message);
+
+      const result: ApiResponseAi = [
+        {
+          status: 'error',
+          body: error.message,
+        },
+      ];
+      return result;
+    } else {
+      console.log('[ERROR]', error);
+
+      const result: ApiResponseAi = [
+        {
+          status: 'error',
+          body: 'An unexpected error occurred',
+        },
+      ];
+      return result;
+    }
+  }
+}
+
+export async function getCharImage(charid: string): Promise<ApiResponseAi> {
+  try {
+    const { data } = await axios.get<Response[]>(
+      `http://localhost:8080/image?charid=${encodeURIComponent(charid)}`,
     );
 
     const result = data;
@@ -76,4 +110,9 @@ export async function chatWithAi(
       return result;
     }
   }
+}
+
+export async function getBufferFromUrl(url: string): Promise<Buffer> {
+  const response = await axios.get(url, { responseType: 'arraybuffer' });
+  return Buffer.from(response.data, 'binary');
 }

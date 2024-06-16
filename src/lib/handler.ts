@@ -12,16 +12,26 @@ import { sticker } from '../commands/sticker.js';
 import { tiktok } from '../commands/tiktok.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import { play } from '../commands/play.js';
+import { sock } from '../index.js';
 import fs from 'fs';
 import utils from './utils.js';
 import path from 'path';
 import 'dotenv/config';
-
+// import { insertData, findData } from './mongo.js';
+// import { db } from '../index.js';
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
   const senderNumber: string = m.key.remoteJid ?? '';
+  const groupMetadata = await sock.groupMetadata(senderNumber).catch(() => {});
+  const isGroup = senderNumber.endsWith('@g.us');
+  const groupMembers =
+    isGroup && groupMetadata && groupMetadata.participants
+      ? groupMetadata.participants
+      : [];
+
   let body;
   const owner1 = process.env.OWNER1;
   const owner2 = process.env.OWNER2;
+  const ownnumber = process.env.BOTNUMBER;
 
   if (m.message) {
     m.mtype = getContentType(m.message);
@@ -84,12 +94,64 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         command,
         senderNumber,
         m.pushName,
+        m.key.remoteJid,
+        ownnumber,
       );
+
       const who = m.key.participant ? m.key.participant : m.key.remoteJid;
 
+      /* 
+      WIP - Work in Progress
+      const data = {
+        _id: who,
+        nama: m.pushName,
+        premium: false,
+        time: new Date(),
+      };
+
+      const cek = await findData(db, 'data_user', { _id: who });
+
+      if (cek && cek.length === 0) {
+        utils.sendText('silahkan register terlebih dahulu', senderNumber);
+        await insertData(db, 'data_user', data);
+      } */
+
+      const q = m.args.join(' ');
       switch (command) {
+        case 'jodohku':
+          {
+            const member = groupMembers.map((i) => i.id);
+            console.log(member);
+            const jodo = member[Math.floor(Math.random() * member.length)];
+            console.log(jodo);
+            const jawab = `jodo kamu adalah @${
+              jodo.split('@')[0]
+            }\nsegera ke KUA sukolilo ya`;
+            const mentions = [jodo];
+            sock.sendMessage(
+              senderNumber,
+              { text: jawab, mentions: mentions },
+              { quoted: m },
+            );
+          }
+          break;
+        case 'hidetag':
+        case 'pengumuman':
+          {
+            const member: Array<string> = [];
+            // console.log('groupMetadata ' + typeof groupMetadata);
+            // console.log('isGroup ' + typeof isGroup);
+            // console.log('groupMembers ' + typeof groupMembers);
+            // console.log(groupMetadata.participants);
+            groupMembers.map((i) => member.push(i.id));
+            sock.sendMessage(senderNumber, {
+              text: q ? q : 'test',
+              mentions: member,
+            });
+          }
+          break;
         case 'help':
-          await helpCommand(senderNumber);
+          await helpCommand(senderNumber, m);
           break;
         case 'p':
           console.log(m.args);
@@ -97,6 +159,16 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         case 'ip':
           await ipaddr(senderNumber);
           break;
+        case 'forward': {
+          const q: string = m.args.join(' ');
+          utils.sendForward(senderNumber, q, true);
+          break;
+        }
+        case 'forward1': {
+          const q: string = m.args.join(' ');
+          utils.sendForward(senderNumber, q, false);
+          break;
+        }
         case 'test':
           utils.sendText(`testo testo dari ${m.pushName}`, senderNumber);
           break;
@@ -127,6 +199,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           }
           break;
         }
+        case 'tt':
         case 'tiktok':
           await tiktok(m.args, senderNumber, m);
           break;
@@ -136,6 +209,25 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         case 'button':
           await utils.sendButtons(senderNumber, m);
           break;
+        // case 'whoami': {
+        //   const data = {
+        //     _id: who,
+        //     nama: m.pushName,
+        //     premium: false,
+        //     time: new Date(),
+        //   };
+
+        //   const cek = await findData(db, 'data_user', { _id: who });
+
+        //   if (cek && cek.length === 0) {
+        //     utils.sendText('silahkan register terlebih dahulu', senderNumber);
+        //     await insertData(db, 'data_user', data);
+        //   }
+
+        //   const cekString = cek?.map((item) => JSON.stringify(item)).join('\n');
+        //   utils.sendText(cekString || 'No data', senderNumber);
+        //   break;
+        // }
         case 'poll':
           console.log(m);
           if (m.args.length > 0) {

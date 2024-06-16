@@ -3,13 +3,30 @@ import { AttachmentInfo, IWebMessageInfoExtended } from './types';
 import { sock } from '../index.js';
 
 const sendText = async (text: string, senderNumber: string): Promise<void> => {
-  await sock.sendMessage(senderNumber, { text: text});
+  await sock.sendMessage(senderNumber, { text: text });
 };
 
-const sendLink = async (text: string, senderNumber: string ): Promise<void> => {
-await sock.sendMessage(senderNumber, {
-  text: text,
-});
+const sendLink = async (
+  text: string,
+  senderNumber: string,
+  thumbnail: string,
+  sourceurl: string,
+): Promise<void> => {
+  await sock.sendMessage(senderNumber, {
+    text: text,
+    contextInfo: {
+      externalAdReply: {
+        title: new Date().toLocaleString(),
+        body: '© tribot-ts staging version',
+        mediaType: 1,
+        thumbnailUrl: thumbnail,
+        sourceUrl: sourceurl,
+        containsAutoReply: false,
+        renderLargerThumbnail: true,
+        showAdAttribution: false,
+      },
+    },
+  });
 };
 
 const sendAttachment = async (
@@ -18,7 +35,7 @@ const sendAttachment = async (
   m: IWebMessageInfoExtended,
 ) => {
   const { type, url, caption, mimetype } = attachmentInfo;
-  console.log(url, caption, type)
+  console.log(url, caption, type);
 
   if (type === 'video') {
     await sock.sendMessage(
@@ -27,21 +44,33 @@ const sendAttachment = async (
       { quoted: m },
     );
   } else if (type === 'image') {
-    await sock.sendMessage(
-      senderNumber,
-      { caption: caption || 'Nyo Gambare', image: { url: url ?? '' } },
-    );
+    await sock.sendMessage(senderNumber, {
+      caption: caption || 'Nyo Gambare',
+      image: { url: url ?? '' },
+    });
   } else if (type === 'audio') {
-  await sock.sendMessage(
-    senderNumber,
-    {
+    await sock.sendMessage(senderNumber, {
       audio: { url: url ?? '' },
       mimetype: mimetype ?? 'audio/mp4',
-    },
-  );
+    });
   } else {
     console.log('kapan kapan');
   }
+};
+
+const sendForward = async (
+  senderNumber: string,
+  text: string,
+  forwading: boolean | number,
+): Promise<void> => {
+  forwading == true ? (forwading = 555) : (forwading = 55);
+  await sock.sendMessage(senderNumber, {
+    text: text,
+    contextInfo: {
+      forwardingScore: forwading,
+      isForwarded: true,
+    },
+  });
 };
 
 const reply = async (
@@ -110,7 +139,11 @@ const sendAudio = async (
 ): Promise<void> => {
   await sock.sendMessage(
     senderNumber,
-    { audio: { url: url ?? '' }, mimetype: mimetype ?? 'audio/mp4', caption: 'Nyo audione'},
+    {
+      audio: { url: url ?? '' },
+      mimetype: mimetype ?? 'audio/mp4',
+      caption: 'Nyo audione',
+    },
     { quoted: m },
   );
 };
@@ -125,6 +158,7 @@ const utils = {
   sendPoll,
   sendButtons,
   sendAudio,
+  sendForward,
 };
 
 export default utils;
