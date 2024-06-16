@@ -21,18 +21,35 @@ import 'dotenv/config';
 // import { db } from '../index.js';
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
   const senderNumber: string = m.key.remoteJid ?? '';
+  const who = m.key.participant ? m.key.participant : m.key.remoteJid;
   const groupMetadata = await sock.groupMetadata(senderNumber).catch(() => {});
   const isGroup = senderNumber.endsWith('@g.us');
   const groupMembers =
     isGroup && groupMetadata && groupMetadata.participants
       ? groupMetadata.participants
       : [];
-
+  const groupName =
+    isGroup && groupMetadata && groupMetadata.subject
+      ? groupMetadata.subject
+      : [];
+  const groupDesc =
+    isGroup && groupMetadata && groupMetadata.desc ? groupMetadata.desc : [];
+  const groupId =
+    isGroup && groupMetadata && groupMetadata.id ? groupMetadata.id : [];
+  const groupOwner =
+    isGroup && groupMetadata && groupMetadata.subjectOwner
+      ? groupMetadata.subjectOwner
+      : [];
+  const user =
+    isGroup && groupMembers ? groupMembers.find((i) => i.id == who) : undefined;
+  // const bot = isGroup && groupMembers ? groupMembers.find((i) => i.id == who ) : [];
+  const isSadmin =
+    isGroup && user && user.admin === 'superadmin' ? 'superadmin' : false;
+  const isAdmin = isGroup && user && user.admin != null ? 'admin' : false;
   let body;
   const owner1 = process.env.OWNER1;
   const owner2 = process.env.OWNER2;
   const ownnumber = process.env.BOTNUMBER;
-
   if (m.message) {
     m.mtype = getContentType(m.message);
 
@@ -80,6 +97,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       const prefix = prefixMatch instanceof Array ? prefixMatch[0] : '/';
       const trimmedBody = body.replace(prefix, '').trim();
       const words = trimmedBody.split(/ +/);
+
       let command;
 
       if (words.length > 0) {
@@ -98,8 +116,6 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         ownnumber,
       );
 
-      const who = m.key.participant ? m.key.participant : m.key.remoteJid;
-
       /* 
       WIP - Work in Progress
       const data = {
@@ -117,6 +133,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       } */
 
       const q = m.args.join(' ');
+
       switch (command) {
         case 'jodohku':
           {
@@ -154,7 +171,12 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           await helpCommand(senderNumber, m);
           break;
         case 'p':
-          console.log(m.args);
+          if (!isGroup) {
+            utils.reply('nah iki0', senderNumber, m);
+          }
+          console.log('ashdjahsk');
+          console.log(isGroup);
+
           break;
         case 'ip':
           await ipaddr(senderNumber);
