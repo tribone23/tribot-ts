@@ -76,7 +76,7 @@ export async function getTiktokVideo(url: string): Promise<ResultTiktok> {
 export async function getYoutubeVideo(url: string): Promise<ResultYoutube> {
   try {
     const { data } = await axios.get<YoutubeApiResponse>(
-      `https://api-tools.tribone.my.id/servertiktok3?url=${url}`,
+      `https://sh.zanixon.xyz/api/downloader/ytmp3?url=${url}`,
       {
         headers: {
           Accept: 'application/json',
