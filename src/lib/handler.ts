@@ -220,15 +220,14 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
               utils.reply('BOT BUKAN ADMIN ', senderNumber, m);
               break;
             }
-
-            const coba = '6285229283686@s.whatsapp.net';
             const jawab: string =
               `Berhasil menambahkan  ${tag.split('@')[0]} ke dalam group ${groupName}` ||
               '';
             await sock
               .groupParticipantsUpdate(senderNumber, [tag], 'add')
-              .then(() => {
+              .then((res) => {
                 utils.replyWithMention(senderNumber, jawab, [tag], m);
+                console.log(res);
               })
               .catch((err) => console.log('bjir error ' + err));
           }
