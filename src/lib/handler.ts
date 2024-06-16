@@ -50,7 +50,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
     isGroup && groupMembers ? groupMembers.find((i) => i.id == who) : undefined;
   const bot =
     isGroup && groupMembers
-      ? groupMembers.find((i) => i.id == ownnumber + '@s.whatsapp.net')
+      ? groupMembers.find((i) => i.id == ownnumber)
       : undefined;
   // const bot = isGroup && groupMembers ? groupMembers.find((i) => i.id == who ) : [];
   const isSadmin =
