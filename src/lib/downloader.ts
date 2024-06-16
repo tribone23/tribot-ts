@@ -19,10 +19,6 @@ type TiktokApiResponse = {
   data: Tiktok;
 };
 
-type YoutubeApiResponse = {
-  data: Youtube;
-};
-
 
 type ResultTiktok = {
   success: boolean;
@@ -33,7 +29,7 @@ type ResultTiktok = {
 type ResultYoutube = {
   success: boolean;
   message?: string;
-  result?: YoutubeApiResponse;
+  result?: Youtube;
 };
 
 export async function getTiktokVideo(url: string): Promise<ResultTiktok> {
@@ -75,7 +71,7 @@ export async function getTiktokVideo(url: string): Promise<ResultTiktok> {
 
 export async function getYoutubeVideo(url: string): Promise<ResultYoutube> {
   try {
-    const { data } = await axios.get<YoutubeApiResponse>(
+    const { data } = await axios.get<Youtube>(
       `https://sh.zanixon.xyz/api/downloader/ytmp3?url=${url}`,
       {
         headers: {
