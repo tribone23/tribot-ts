@@ -17,7 +17,7 @@ const sendLink = async (
     contextInfo: {
       externalAdReply: {
         title: new Date().toLocaleString(),
-        body: '© tribot-ts staging version',
+        body: '© tribot-ts stable version',
         mediaType: 1,
         thumbnailUrl: thumbnail,
         sourceUrl: sourceurl,
