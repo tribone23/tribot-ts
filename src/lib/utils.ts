@@ -72,6 +72,18 @@ const sendForward = async (
     },
   });
 };
+const replyWithMention = async (
+  SenderNumber: string,
+  Text: string,
+  Mentions: string[],
+  M: IWebMessageInfoExtended,
+): Promise<void> => {
+  await sock.sendMessage(
+    SenderNumber,
+    { text: Text, mentions: Mentions },
+    { quoted: M },
+  );
+};
 
 const reply = async (
   text: string,
@@ -153,6 +165,7 @@ const utils = {
   sendLink,
   sendAttachment,
   reply,
+  replyWithMention,
   replyWithImages,
   replyWithSticker,
   sendPoll,

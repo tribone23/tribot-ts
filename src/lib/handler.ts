@@ -20,6 +20,12 @@ import 'dotenv/config';
 // import { insertData, findData } from './mongo.js';
 // import { db } from '../index.js';
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
+  let body;
+  let mentionByReply;
+  let mentionByTag;
+  const owner1 = process.env.OWNER1;
+  const owner2 = process.env.OWNER2;
+  const ownnumber = process.env.BOTNUMBER;
   const senderNumber: string = m.key.remoteJid ?? '';
   const who = m.key.participant ? m.key.participant : m.key.remoteJid;
   const groupMetadata = await sock.groupMetadata(senderNumber).catch(() => {});
@@ -42,17 +48,32 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       : [];
   const user =
     isGroup && groupMembers ? groupMembers.find((i) => i.id == who) : undefined;
+  const bot =
+    isGroup && groupMembers
+      ? groupMembers.find((i) => i.id == ownnumber + '@s.whatsapp.net')
+      : undefined;
   // const bot = isGroup && groupMembers ? groupMembers.find((i) => i.id == who ) : [];
   const isSadmin =
-    isGroup && user && user.admin === 'superadmin' ? 'superadmin' : false;
-  const isAdmin = isGroup && user && user.admin != null ? 'admin' : false;
-  let body;
-  const owner1 = process.env.OWNER1;
-  const owner2 = process.env.OWNER2;
-  const ownnumber = process.env.BOTNUMBER;
+    isGroup && user && user.admin === 'superadmin' ? true : false;
+  const isAdmin = isGroup && user && user.admin === 'admin' ? true : false;
+  const isBotGroupAdmins =
+    (isGroup && bot && bot.admin === 'admin') ||
+    (isGroup && bot && bot.admin === 'superadmin')
+      ? true
+      : false;
   if (m.message) {
     m.mtype = getContentType(m.message);
+    mentionByTag =
+      m.mtype == 'extendedTextMessage' &&
+      m.message?.extendedTextMessage?.contextInfo != null
+        ? m.message.extendedTextMessage.contextInfo.mentionedJid
+        : [];
 
+    mentionByReply =
+      m.mtype == 'extendedTextMessage' &&
+      m.message?.extendedTextMessage?.contextInfo != null
+        ? m.message.extendedTextMessage.contextInfo.participant || ''
+        : '';
     try {
       body =
         m.mtype === 'conversation'
@@ -133,8 +154,22 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       } */
 
       const q = m.args.join(' ');
-
+      const tag =
+        mentionByTag && mentionByTag.length > 0
+          ? mentionByTag[0]
+          : mentionByReply && mentionByReply.length > 0
+            ? mentionByReply[0]
+            : q + '@s.whatsapp.net';
+      if (mentionByReply) {
+        utils.reply('GA SUKA DI REPLY!!', mentionByReply, m);
+      }
       switch (command) {
+        case 'p':
+          console.log(isAdmin, isBotGroupAdmins, isSadmin, 'true kabek kah');
+          console.log('sek sek sek');
+          console.log(groupMembers);
+          console.log('nomer bot e', ownnumber);
+          break;
         case 'jodohku':
           {
             const member = groupMembers.map((i) => i.id);
@@ -150,6 +185,52 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
               { text: jawab, mentions: mentions },
               { quoted: m },
             );
+          }
+          break;
+
+        case 'kick':
+          if (!isGroup) {
+            utils.reply('minimal di group', senderNumber, m);
+            break;
+          } else if (!isBotGroupAdmins) {
+            console.log(isBotGroupAdmins);
+            utils.reply('BOT BUKAN ADMIN ', senderNumber, m);
+            break;
+          }
+          await sock
+            .groupParticipantsUpdate(senderNumber, [tag], 'remove')
+            .then(() => {
+              utils.reply(
+                `Mampus keluar lu ${
+                  tag.split('@')[0]
+                } jauh jauh dari group ${groupName} ini`,
+                senderNumber,
+                m,
+              );
+            })
+            .catch((err) => console.log('bjir error ' + err));
+          break;
+        case 'add':
+          {
+            console.log('tes');
+            if (!isGroup) {
+              utils.reply('minimal di group', senderNumber, m);
+              break;
+            } else if (!isBotGroupAdmins) {
+              utils.reply('BOT BUKAN ADMIN ', senderNumber, m);
+              break;
+            }
+
+            const coba = '6285229283686@s.whatsapp.net';
+            const jawab: string =
+              `Berhasil menambahkan  ${tag.split('@')[0]} ke dalam group ${groupName}` ||
+              '';
+            await sock
+              .groupParticipantsUpdate(senderNumber, [tag], 'add')
+              .then(() => {
+                utils.replyWithMention(senderNumber, jawab, [tag], m);
+              })
+              .catch((err) => console.log('bjir error ' + err));
           }
           break;
         case 'hidetag':
@@ -170,14 +251,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         case 'help':
           await helpCommand(senderNumber, m);
           break;
-        case 'p':
-          if (!isGroup) {
-            utils.reply('nah iki0', senderNumber, m);
-          }
-          console.log('ashdjahsk');
-          console.log(isGroup);
 
-          break;
         case 'ip':
           await ipaddr(senderNumber);
           break;
