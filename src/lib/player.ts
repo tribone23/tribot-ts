@@ -10,9 +10,6 @@ export default async function ytPlayer(
   m: IWebMessageInfoExtended,
 ) {
   try {
-   // const info = await ytdl.getInfo(url);
-    //const format = ytdl.chooseFormat(info.formats, { quality: 'lowestaudio' });
-    // console.log(format.url);
     const start = performance.now();
     const result = await getYoutubeVideo(url);
 
