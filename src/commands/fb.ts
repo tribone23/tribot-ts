@@ -4,7 +4,7 @@ import { performance } from 'perf_hooks';
 
 import utils from '../lib/utils.js';
 
-export async function tiktok(
+export async function facebook(
   url: Array<string>,
   senderNumber: string,
   m: IWebMessageInfoExtended,

@@ -1,3 +1,6 @@
+import fs from 'fs';
+import utils from './utils.js';
+import path from 'path';
 import {
   downloadMediaMessage,
   getContentType,
@@ -10,15 +13,15 @@ import { speedtest } from '../commands/speedtest.js';
 import { shell } from '../commands/shell.js';
 import { sticker } from '../commands/sticker.js';
 import { tiktok } from '../commands/tiktok.js';
+import { facebook } from '../commands/fb.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import { play } from '../commands/play.js';
 import { sock } from '../index.js';
-import fs from 'fs';
-import utils from './utils.js';
-import path from 'path';
+
 import 'dotenv/config';
 // import { insertData, findData } from './mongo.js';
 // import { db } from '../index.js';
+
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
   let body;
   let mentionByReply;
@@ -39,7 +42,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       ? groupMetadata.subject
       : [];
 
-  /* declared tapi not used
+  /* declared tapi not used, warn eslint
   const groupDesc =
     isGroup && groupMetadata && groupMetadata.desc ? groupMetadata.desc : [];
   const groupId =
@@ -171,6 +174,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
 
       switch (command) {
         case 'p':
+          // kalau debugging di local saja mas
           console.log(isAdmin, isBotGroupAdmins, isSadmin, 'true kabek kah');
           console.log('sek sek sek');
           console.log(groupMembers);
@@ -303,6 +307,9 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         case 'tt':
         case 'tiktok':
           await tiktok(m.args, senderNumber, m);
+          break;
+        case 'fb':
+          await facebook(m.args, senderNumber, m);
           break;
         case 'play':
           await play(m.args, senderNumber, m);
