@@ -38,6 +38,8 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
     isGroup && groupMetadata && groupMetadata.subject
       ? groupMetadata.subject
       : [];
+
+  /* declared tapi not used
   const groupDesc =
     isGroup && groupMetadata && groupMetadata.desc ? groupMetadata.desc : [];
   const groupId =
@@ -46,6 +48,8 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
     isGroup && groupMetadata && groupMetadata.subjectOwner
       ? groupMetadata.subjectOwner
       : [];
+    */
+
   const user =
     isGroup && groupMembers ? groupMembers.find((i) => i.id == who) : undefined;
   const bot =
@@ -154,6 +158,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       } */
 
       const q = m.args.join(' ');
+
       const tag =
         mentionByTag && mentionByTag.length > 0
           ? mentionByTag[0]
@@ -163,6 +168,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       if (mentionByReply) {
         utils.reply('GA SUKA DI REPLY!!', mentionByReply, m);
       }
+
       switch (command) {
         case 'p':
           console.log(isAdmin, isBotGroupAdmins, isSadmin, 'true kabek kah');
