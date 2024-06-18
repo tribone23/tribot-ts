@@ -18,7 +18,7 @@ export async function facebook(
     if (result.success) {
       const data: AttachmentInfo = {
         type: 'video',
-        url: result.result?.url,
+        url: result.result?.sd,
         caption: `" ${result.result?.title} "`,
       };
 
