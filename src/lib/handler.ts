@@ -168,8 +168,8 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           : mentionByReply && mentionByReply.length > 0
             ? mentionByReply[0]
             : q + '@s.whatsapp.net';
-      if (mentionByReply) {
-        utils.reply('GA SUKA DI REPLY!!', mentionByReply, m);
+      if (mentionByReply == ownnumber) {
+        utils.reply('GA SUKA DI REPLY!!', senderNumber, m);
       }
 
       switch (command) {
