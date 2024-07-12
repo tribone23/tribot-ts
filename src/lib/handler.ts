@@ -43,6 +43,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       ? groupMetadata.subject
       : [];
 
+
   /* declared tapi not used, warn eslint
   const groupDesc =
     isGroup && groupMetadata && groupMetadata.desc ? groupMetadata.desc : [];

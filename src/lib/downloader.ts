@@ -27,7 +27,6 @@ type TiktokApiResponse = {
   data: Tiktok;
 };
 
-
 type ResultTiktok = {
   success: boolean;
   message?: string;

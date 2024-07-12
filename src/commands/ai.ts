@@ -20,7 +20,6 @@ export async function aiChatHandler(
   remoteJid: string | null | undefined,
   ownnumber: string | undefined,
 ) {
-
   const ownJid = ownnumber || remoteJid;
   const userState = aiModeUsers.get(senderNumber) ?? {
     aiModeEnabled: false,
@@ -77,7 +76,10 @@ export async function aiChatHandler(
                   await getBufferFromUrl(imageUrl),
                 );
               } catch (e) {
-                console.log("[x] Failed to set profile info for AI character, ignoring...\n", e);
+                console.log(
+                  '[x] Failed to set profile info for AI character, ignoring...\n',
+                  e,
+                );
               }
             }
           } else {

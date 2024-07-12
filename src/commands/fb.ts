@@ -24,10 +24,7 @@ export async function facebook(
 
       await utils.sendAttachment(data, senderNumber, m);
       const end = performance.now();
-      await utils.sendText(
-        `⏱️ ${end - start} ms`,
-        senderNumber,
-      );
+      await utils.sendText(`⏱️ ${end - start} ms`, senderNumber);
     } else {
       utils.reply(result.message!, senderNumber, m);
     }

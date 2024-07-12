@@ -34,7 +34,7 @@ async function triBotInitialize(reconnectAttempt = 0) {
   const { state, saveCreds } = await useMultiFileAuthState('auth');
   const { version } = await fetchLatestBaileysVersion();
   const maxReconnectAttempts = 5;
-  const reconnectDelay = 5000; 
+  const reconnectDelay = 5000;
 
   const sock = makeWASocket({
     version,
@@ -126,6 +126,26 @@ async function triBotInitialize(reconnectAttempt = 0) {
         console.log(errMsg);
       } finally {
         await sock.sendPresenceUpdate('available', message.key.remoteJid!);
+      }
+    }
+  });
+
+  sock.ev.on('group-participants.update', async (update) => {
+    //console.log(update);
+
+    if (update.action === 'add') {
+      const participants = update.participants;
+      const groupMetadata = await sock.groupMetadata(update.id);
+      const groupName = groupMetadata.subject;
+      const memberCount = groupMetadata.participants.length;
+
+      for (const participant of participants) {
+        const participantName = participant.split('@')[0];
+        const welcomeMessage = `Selamat datang di ${groupName}, @${participantName} senpai 🎉\nKamu adalah member ke-${memberCount} 🔥`;
+        await sock.sendMessage(update.id, {
+          text: welcomeMessage,
+          mentions: [participant],
+        });
       }
     }
   });
