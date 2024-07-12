@@ -43,7 +43,7 @@ export async function aiChatHandler(
         break;
 
       default:
-        if (userState.characterId) {
+        if (userState.characterId && body.length > 0) {
           const userMessage = `${senderName}: ${body}`;
           const characterResponse: ApiResponseAi = await chatWithAi(
             userState.characterId,
