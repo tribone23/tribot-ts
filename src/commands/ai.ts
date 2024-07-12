@@ -25,7 +25,7 @@ export async function aiChatHandler(
     aiModeEnabled: false,
   };
 
-  if (userState.aiModeEnabled) {
+  if (userState.aiModeEnabled && body.length > 0) {
     switch (command) {
       case 'exit':
         userState.aiModeEnabled = false; // Disable AI mode for user
@@ -43,7 +43,7 @@ export async function aiChatHandler(
         break;
 
       default:
-        if (userState.characterId && body.length > 0) {
+        if (userState.characterId) {
           const userMessage = `${senderName}: ${body}`;
           const characterResponse: ApiResponseAi = await chatWithAi(
             userState.characterId,
