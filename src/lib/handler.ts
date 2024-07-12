@@ -26,6 +26,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
   let body;
   let mentionByReply;
   let mentionByTag;
+
   const owner1 = process.env.OWNER1;
   const owner2 = process.env.OWNER2;
   const ownnumber = process.env.BOTNUMBER;
@@ -119,20 +120,35 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
 
   if (typeof body === 'string') {
     try {
-      const prefixMatch = /^[\\/!#.]/gi.test(body)
-        ? body.match(/^[\\/!#.]/gi)
-        : '/';
-      const prefix = prefixMatch instanceof Array ? prefixMatch[0] : '/';
-      const trimmedBody = body.replace(prefix, '').trim();
+      const trimmedBody = body.trim();
       const words = trimmedBody.split(/ +/);
 
       let command;
 
-      if (words.length > 0) {
+      const isTagged = body.includes('@' + ownnumber);
+      const isReply =
+        mentionByReply && mentionByReply == ownnumber + '@s.whatsapp.net'
+          ? true
+          : false;
+
+      // console.log('Is Tagged:', isTagged);
+      // console.log('Is Reply:', isReply);
+
+      if (words.length > 0 && isTagged) {
+        command = words[1].toLowerCase();
+        m.args = words.slice(2);
+      } else if (isReply) {
         command = words[0].toLowerCase();
         m.args = words.slice(1);
       } else {
         m.args = [];
+      }
+
+      // console.log('Command:', command);
+      // console.log('Arguments:', m.args);
+
+      if (!isTagged && !isReply) {
+        return;
       }
 
       const userState = await aiChatHandler(
@@ -144,33 +160,14 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         ownnumber,
       );
 
-      /* 
-      WIP - Work in Progress
-      const data = {
-        _id: who,
-        nama: m.pushName,
-        premium: false,
-        time: new Date(),
-      };
-
-      const cek = await findData(db, 'data_user', { _id: who });
-
-      if (cek && cek.length === 0) {
-        utils.sendText('silahkan register terlebih dahulu', senderNumber);
-        await insertData(db, 'data_user', data);
-      } */
-
       const q = m.args.join(' ');
 
       const tag =
         mentionByTag && mentionByTag.length > 0
-          ? mentionByTag[0]
+          ? mentionByTag[1]
           : mentionByReply && mentionByReply.length > 0
-            ? mentionByReply[0]
+            ? mentionByReply
             : q + '@s.whatsapp.net';
-      if (mentionByReply == ownnumber) {
-        utils.reply('GA SUKA DI REPLY!!', senderNumber, m);
-      }
 
       switch (command) {
         case 'p':
@@ -202,11 +199,12 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           if (!isGroup) {
             utils.reply('minimal di group', senderNumber, m);
             break;
-          } else if (!isBotGroupAdmins) {
-            console.log(isBotGroupAdmins);
-            utils.reply('BOT BUKAN ADMIN ', senderNumber, m);
-            break;
           }
+          // else if (!isBotGroupAdmins) {
+          //   console.log(isBotGroupAdmins);
+          //   utils.reply('BOT BUKAN ADMIN ', senderNumber, m);
+          //   break;
+          // }
           await sock
             .groupParticipantsUpdate(senderNumber, [tag], 'remove')
             .then(() => {
@@ -222,21 +220,22 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           break;
         case 'add':
           {
-            console.log('tes');
             if (!isGroup) {
               utils.reply('minimal di group', senderNumber, m);
               break;
-            } else if (!isBotGroupAdmins) {
-              utils.reply('BOT BUKAN ADMIN ', senderNumber, m);
-              break;
             }
-            const jawab: string =
-              `Berhasil menambahkan  ${tag.split('@')[0]} ke dalam group ${groupName}` ||
+            // else if (!isBotGroupAdmins) {
+            //   utils.reply('BOT BUKAN ADMIN ', senderNumber, m);
+            //   break;
+            // }
+            const number = m.args[0] + '@s.whatsapp.net';
+            const jawab =
+              `Berhasil menambahkan  ${number.split('@')[0]} ke dalam group ${groupName}` ||
               '';
             await sock
-              .groupParticipantsUpdate(senderNumber, [tag], 'add')
+              .groupParticipantsUpdate(senderNumber, [number], 'add')
               .then((res) => {
-                utils.replyWithMention(senderNumber, jawab, [tag], m);
+                utils.replyWithMention(senderNumber, jawab, [number], m);
                 console.log(res);
               })
               .catch((err) => console.log('bjir error ' + err));
