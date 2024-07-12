@@ -43,7 +43,6 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       ? groupMetadata.subject
       : [];
 
-
   /* declared tapi not used, warn eslint
   const groupDesc =
     isGroup && groupMetadata && groupMetadata.desc ? groupMetadata.desc : [];
@@ -147,11 +146,6 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
 
       // console.log('Command:', command);
       // console.log('Arguments:', m.args);
-
-      if (!isTagged && !isReply) {
-        return;
-      }
-
       const userState = await aiChatHandler(
         body,
         command,
@@ -160,6 +154,10 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         m.key.remoteJid,
         ownnumber,
       );
+
+      if (!isTagged && !isReply) {
+        return;
+      }
 
       const q = m.args.join(' ');
 
