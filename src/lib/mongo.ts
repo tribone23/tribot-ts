@@ -158,8 +158,7 @@
 // //     'data_user',
 // //     { _id: '6289649178812@s.whatsapp.net' },
 // //     { $set: { nama: 'siti' } },
-// //   );
-// //   await findData(db, 'data_user', { nama: 'siti' });
+// //   );// //   await findData(db, 'data_user', { nama: 'siti' });
 
 // //   //   await client.close();
 // // }

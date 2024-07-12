@@ -17,7 +17,7 @@ const sendLink = async (
     contextInfo: {
       externalAdReply: {
         title: new Date().toLocaleString(),
-        body: '© tribot-ts staging version',
+        body: '© tribot-ts stable version',
         mediaType: 1,
         thumbnailUrl: thumbnail,
         sourceUrl: sourceurl,
@@ -71,6 +71,18 @@ const sendForward = async (
       isForwarded: true,
     },
   });
+};
+const replyWithMention = async (
+  SenderNumber: string,
+  Text: string,
+  Mentions: string[],
+  M: IWebMessageInfoExtended,
+): Promise<void> => {
+  await sock.sendMessage(
+    SenderNumber,
+    { text: Text, mentions: Mentions },
+    { quoted: M },
+  );
 };
 
 const reply = async (
@@ -153,6 +165,7 @@ const utils = {
   sendLink,
   sendAttachment,
   reply,
+  replyWithMention,
   replyWithImages,
   replyWithSticker,
   sendPoll,

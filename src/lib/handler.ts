@@ -1,3 +1,6 @@
+import fs from 'fs';
+import utils from './utils.js';
+import path from 'path';
 import {
   downloadMediaMessage,
   getContentType,
@@ -10,32 +13,74 @@ import { speedtest } from '../commands/speedtest.js';
 import { shell } from '../commands/shell.js';
 import { sticker } from '../commands/sticker.js';
 import { tiktok } from '../commands/tiktok.js';
+import { facebook } from '../commands/fb.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import { play } from '../commands/play.js';
 import { sock } from '../index.js';
-import fs from 'fs';
-import utils from './utils.js';
-import path from 'path';
+
 import 'dotenv/config';
 // import { insertData, findData } from './mongo.js';
 // import { db } from '../index.js';
+
 export default async function (m: IWebMessageInfoExtended): Promise<void> {
+  let body;
+  let mentionByReply;
+  let mentionByTag;
+  const owner1 = process.env.OWNER1;
+  const owner2 = process.env.OWNER2;
+  const ownnumber = process.env.BOTNUMBER;
   const senderNumber: string = m.key.remoteJid ?? '';
+  const who = m.key.participant ? m.key.participant : m.key.remoteJid;
   const groupMetadata = await sock.groupMetadata(senderNumber).catch(() => {});
   const isGroup = senderNumber.endsWith('@g.us');
   const groupMembers =
     isGroup && groupMetadata && groupMetadata.participants
       ? groupMetadata.participants
       : [];
+  const groupName =
+    isGroup && groupMetadata && groupMetadata.subject
+      ? groupMetadata.subject
+      : [];
 
-  let body;
-  const owner1 = process.env.OWNER1;
-  const owner2 = process.env.OWNER2;
-  const ownnumber = process.env.BOTNUMBER;
+  /* declared tapi not used, warn eslint
+  const groupDesc =
+    isGroup && groupMetadata && groupMetadata.desc ? groupMetadata.desc : [];
+  const groupId =
+    isGroup && groupMetadata && groupMetadata.id ? groupMetadata.id : [];
+  const groupOwner =
+    isGroup && groupMetadata && groupMetadata.subjectOwner
+      ? groupMetadata.subjectOwner
+      : [];
+    */
 
+  const user =
+    isGroup && groupMembers ? groupMembers.find((i) => i.id == who) : undefined;
+  const bot =
+    isGroup && groupMembers
+      ? groupMembers.find((i) => i.id == ownnumber)
+      : undefined;
+  // const bot = isGroup && groupMembers ? groupMembers.find((i) => i.id == who ) : [];
+  const isSadmin =
+    isGroup && user && user.admin === 'superadmin' ? true : false;
+  const isAdmin = isGroup && user && user.admin === 'admin' ? true : false;
+  const isBotGroupAdmins =
+    (isGroup && bot && bot.admin === 'admin') ||
+    (isGroup && bot && bot.admin === 'superadmin')
+      ? true
+      : false;
   if (m.message) {
     m.mtype = getContentType(m.message);
+    mentionByTag =
+      m.mtype == 'extendedTextMessage' &&
+      m.message?.extendedTextMessage?.contextInfo != null
+        ? m.message.extendedTextMessage.contextInfo.mentionedJid
+        : [];
 
+    mentionByReply =
+      m.mtype == 'extendedTextMessage' &&
+      m.message?.extendedTextMessage?.contextInfo != null
+        ? m.message.extendedTextMessage.contextInfo.participant || ''
+        : '';
     try {
       body =
         m.mtype === 'conversation'
@@ -80,6 +125,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       const prefix = prefixMatch instanceof Array ? prefixMatch[0] : '/';
       const trimmedBody = body.replace(prefix, '').trim();
       const words = trimmedBody.split(/ +/);
+
       let command;
 
       if (words.length > 0) {
@@ -98,8 +144,6 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         ownnumber,
       );
 
-      const who = m.key.participant ? m.key.participant : m.key.remoteJid;
-
       /* 
       WIP - Work in Progress
       const data = {
@@ -117,7 +161,25 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       } */
 
       const q = m.args.join(' ');
+
+      const tag =
+        mentionByTag && mentionByTag.length > 0
+          ? mentionByTag[0]
+          : mentionByReply && mentionByReply.length > 0
+            ? mentionByReply[0]
+            : q + '@s.whatsapp.net';
+      if (mentionByReply == ownnumber) {
+        utils.reply('GA SUKA DI REPLY!!', senderNumber, m);
+      }
+
       switch (command) {
+        case 'p':
+          // kalau debugging di local saja mas
+          console.log(isAdmin, isBotGroupAdmins, isSadmin, 'true kabek kah');
+          console.log('sek sek sek');
+          console.log(groupMembers);
+          console.log('nomer bot e', ownnumber);
+          break;
         case 'jodohku':
           {
             const member = groupMembers.map((i) => i.id);
@@ -133,6 +195,51 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
               { text: jawab, mentions: mentions },
               { quoted: m },
             );
+          }
+          break;
+
+        case 'kick':
+          if (!isGroup) {
+            utils.reply('minimal di group', senderNumber, m);
+            break;
+          } else if (!isBotGroupAdmins) {
+            console.log(isBotGroupAdmins);
+            utils.reply('BOT BUKAN ADMIN ', senderNumber, m);
+            break;
+          }
+          await sock
+            .groupParticipantsUpdate(senderNumber, [tag], 'remove')
+            .then(() => {
+              utils.reply(
+                `Mampus keluar lu ${
+                  tag.split('@')[0]
+                } jauh jauh dari group ${groupName} ini`,
+                senderNumber,
+                m,
+              );
+            })
+            .catch((err) => console.log('bjir error ' + err));
+          break;
+        case 'add':
+          {
+            console.log('tes');
+            if (!isGroup) {
+              utils.reply('minimal di group', senderNumber, m);
+              break;
+            } else if (!isBotGroupAdmins) {
+              utils.reply('BOT BUKAN ADMIN ', senderNumber, m);
+              break;
+            }
+            const jawab: string =
+              `Berhasil menambahkan  ${tag.split('@')[0]} ke dalam group ${groupName}` ||
+              '';
+            await sock
+              .groupParticipantsUpdate(senderNumber, [tag], 'add')
+              .then((res) => {
+                utils.replyWithMention(senderNumber, jawab, [tag], m);
+                console.log(res);
+              })
+              .catch((err) => console.log('bjir error ' + err));
           }
           break;
         case 'hidetag':
@@ -153,9 +260,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         case 'help':
           await helpCommand(senderNumber, m);
           break;
-        case 'p':
-          console.log(m.args);
-          break;
+
         case 'ip':
           await ipaddr(senderNumber);
           break;
@@ -202,6 +307,9 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         case 'tt':
         case 'tiktok':
           await tiktok(m.args, senderNumber, m);
+          break;
+        case 'fb':
+          await facebook(m.args, senderNumber, m);
           break;
         case 'play':
           await play(m.args, senderNumber, m);
