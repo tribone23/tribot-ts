@@ -21,7 +21,7 @@ export async function aiChatHandler(
   ownnumber: string | undefined,
 ) {
 
-  const ownJid = ownnumber || remoteJid;
+  const ownJid = ownnumber + '@s.whatsapp.net' || remoteJid;
   const userState = aiModeUsers.get(senderNumber) ?? {
     aiModeEnabled: false,
   };
