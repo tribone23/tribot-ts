@@ -133,6 +133,9 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
 
       // console.log('Is Tagged:', isTagged);
       // console.log('Is Reply:', isReply);
+      if (!isTagged && !isReply) {
+        return;
+      }
 
       if (words.length > 0 && isTagged) {
         command = words[1].toLowerCase();
@@ -154,10 +157,6 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         m.key.remoteJid,
         ownnumber,
       );
-
-      if (!isTagged && !isReply) {
-        return;
-      }
 
       const q = m.args.join(' ');
 
