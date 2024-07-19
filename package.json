@@ -34,6 +34,8 @@
     "@whiskeysockets/baileys": "^6.6.0",
     "axios": "^1.6.7",
     "dotenv": "^16.4.5",
+    "google-auth-library": "^9.11.0",
+    "google-spreadsheet": "^4.1.2",
     "libphonenumber-js": "^1.10.58",
     "mongodb": "^6.5.0",
     "node-cache": "^5.1.2",

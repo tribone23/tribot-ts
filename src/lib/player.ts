@@ -13,7 +13,6 @@ export default async function ytPlayer(
     const start = performance.now();
     const result = await getYoutubeVideo(url);
 
-
     if (result.success) {
       const data: AttachmentInfo = {
         type: 'audio',
@@ -43,7 +42,6 @@ export default async function ytPlayer(
     //   senderNumber,
     //   m,
     // );
-
   } catch (error) {
     console.error(error);
     utils.reply(

@@ -24,3 +24,10 @@ export interface PollMessage {
   voters: WAMessageContent;
   type: string;
 }
+
+export interface SpendRowData {
+  Item: string;
+  Kategori: string;
+  Nominal: number;
+  Tanggal: string;
+}

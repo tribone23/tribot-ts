@@ -34,7 +34,7 @@ async function triBotInitialize(reconnectAttempt = 0) {
   const { state, saveCreds } = await useMultiFileAuthState('auth');
   const { version } = await fetchLatestBaileysVersion();
   const maxReconnectAttempts = 5;
-  const reconnectDelay = 5000; 
+  const reconnectDelay = 5000;
 
   const sock = makeWASocket({
     version,

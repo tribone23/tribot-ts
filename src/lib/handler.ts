@@ -16,6 +16,7 @@ import { tiktok } from '../commands/tiktok.js';
 import { facebook } from '../commands/fb.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import { play } from '../commands/play.js';
+import { recapSpend, spendOut } from '../commands/spend.js';
 import { sock } from '../index.js';
 
 import 'dotenv/config';
@@ -316,6 +317,12 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           break;
         case 'button':
           await utils.sendButtons(senderNumber, m);
+          break;
+        case 'keluar':
+          await spendOut(m.args, who, senderNumber, m);
+          break;
+        case 'rekap':
+          await recapSpend(m.args, who, senderNumber, m);
           break;
         // case 'whoami': {
         //   const data = {
