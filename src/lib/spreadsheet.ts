@@ -33,7 +33,7 @@ export async function credit(
       const date = new Date();
       const newSheet = await doc.addSheet({
         title: title,
-        headerValues: ['Item', 'Kategori', 'Nominal', 'Tanggal'],
+        headerValues: ['Item', 'Kategori', 'Nominal', 'Tanggal', '_date', '_source'],
       });
 
       await newSheet.addRow({
