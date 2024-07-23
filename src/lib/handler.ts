@@ -72,7 +72,6 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       : false;
       
   if (m.message) {
-    console.log(m)
     m.mtype = getContentType(m.message);
     mentionByTag =
       m.mtype == 'extendedTextMessage' &&
