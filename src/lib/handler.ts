@@ -32,8 +32,9 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
   const ownnumber = process.env.BOTNUMBER;
   const senderNumber: string = m.key.remoteJid ?? '';
   const who = m.key.participant ? m.key.participant : m.key.remoteJid;
-  const groupMetadata = await sock.groupMetadata(senderNumber).catch(() => {});
+  
   const isGroup = senderNumber.endsWith('@g.us');
+  const groupMetadata = isGroup ? await sock.groupMetadata(senderNumber).catch(() => {}) : null;
   const groupMembers =
     isGroup && groupMetadata && groupMetadata.participants
       ? groupMetadata.participants
@@ -69,7 +70,9 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
     (isGroup && bot && bot.admin === 'superadmin')
       ? true
       : false;
+      
   if (m.message) {
+    console.log(m)
     m.mtype = getContentType(m.message);
     mentionByTag =
       m.mtype == 'extendedTextMessage' &&
@@ -82,10 +85,12 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       m.message?.extendedTextMessage?.contextInfo != null
         ? m.message.extendedTextMessage.contextInfo.participant || ''
         : '';
+  }
+    
     try {
       body =
         m.mtype === 'conversation'
-          ? m.message.conversation
+          ? m.message?.conversation
           : m.mtype == 'imageMessage'
             ? m.message?.imageMessage?.caption
             : m.mtype == 'videoMessage'
@@ -107,7 +112,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
                       : m.mtype == 'templateButtonReplyMessage'
                         ? m.message?.templateButtonReplyMessage?.selectedId
                         : m.mtype === 'messageContextInfo'
-                          ? m.message.buttonsResponseMessage
+                          ? m.message?.buttonsResponseMessage
                               ?.selectedButtonId ||
                             m.message?.listResponseMessage?.singleSelectReply
                               ?.selectedRowId ||
@@ -116,7 +121,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
     } catch (e) {
       console.log(e);
     }
-  }
+
 
   if (typeof body === 'string') {
     try {
