@@ -32,9 +32,11 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
   const ownnumber = process.env.BOTNUMBER;
   const senderNumber: string = m.key.remoteJid ?? '';
   const who = m.key.participant ? m.key.participant : m.key.remoteJid;
-  
+
   const isGroup = senderNumber.endsWith('@g.us');
-  const groupMetadata = isGroup ? await sock.groupMetadata(senderNumber).catch(() => {}) : null;
+  const groupMetadata = isGroup
+    ? await sock.groupMetadata(senderNumber).catch(() => {})
+    : null;
   const groupMembers =
     isGroup && groupMetadata && groupMetadata.participants
       ? groupMetadata.participants
@@ -61,6 +63,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
     isGroup && groupMembers
       ? groupMembers.find((i) => i.id == ownnumber)
       : undefined;
+  console.log(bot);
   // const bot = isGroup && groupMembers ? groupMembers.find((i) => i.id == who ) : [];
   const isSadmin =
     isGroup && user && user.admin === 'superadmin' ? true : false;
@@ -70,7 +73,7 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
     (isGroup && bot && bot.admin === 'superadmin')
       ? true
       : false;
-      
+
   if (m.message) {
     m.mtype = getContentType(m.message);
     mentionByTag =
@@ -85,42 +88,40 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         ? m.message.extendedTextMessage.contextInfo.participant || ''
         : '';
   }
-    
-    try {
-      body =
-        m.mtype === 'conversation'
-          ? m.message?.conversation
-          : m.mtype == 'imageMessage'
-            ? m.message?.imageMessage?.caption
-            : m.mtype == 'videoMessage'
-              ? m.message?.videoMessage?.caption ||
-                m.message?.extendedTextMessage?.contextInfo?.quotedMessage
-                  ?.videoMessage
-              : m.mtype == 'extendedTextMessage'
-                ? m.message?.extendedTextMessage?.text ||
-                  m.message?.extendedTextMessage?.contextInfo?.quotedMessage
-                    ?.conversation
-                : m.mtype == 'ephemeralMessage'
-                  ? m.message?.ephemeralMessage?.message?.extendedTextMessage
-                      ?.text
-                  : m.mtype == 'buttonsResponseMessage'
-                    ? m.message?.buttonsResponseMessage?.selectedButtonId
-                    : m.mtype == 'listResponseMessage'
-                      ? m.message?.listResponseMessage?.singleSelectReply
-                          ?.selectedRowId
-                      : m.mtype == 'templateButtonReplyMessage'
-                        ? m.message?.templateButtonReplyMessage?.selectedId
-                        : m.mtype === 'messageContextInfo'
-                          ? m.message?.buttonsResponseMessage
-                              ?.selectedButtonId ||
-                            m.message?.listResponseMessage?.singleSelectReply
-                              ?.selectedRowId ||
-                            m.text
-                          : '';
-    } catch (e) {
-      console.log(e);
-    }
 
+  try {
+    body =
+      m.mtype === 'conversation'
+        ? m.message?.conversation
+        : m.mtype == 'imageMessage'
+          ? m.message?.imageMessage?.caption
+          : m.mtype == 'videoMessage'
+            ? m.message?.videoMessage?.caption ||
+              m.message?.extendedTextMessage?.contextInfo?.quotedMessage
+                ?.videoMessage
+            : m.mtype == 'extendedTextMessage'
+              ? m.message?.extendedTextMessage?.text ||
+                m.message?.extendedTextMessage?.contextInfo?.quotedMessage
+                  ?.conversation
+              : m.mtype == 'ephemeralMessage'
+                ? m.message?.ephemeralMessage?.message?.extendedTextMessage
+                    ?.text
+                : m.mtype == 'buttonsResponseMessage'
+                  ? m.message?.buttonsResponseMessage?.selectedButtonId
+                  : m.mtype == 'listResponseMessage'
+                    ? m.message?.listResponseMessage?.singleSelectReply
+                        ?.selectedRowId
+                    : m.mtype == 'templateButtonReplyMessage'
+                      ? m.message?.templateButtonReplyMessage?.selectedId
+                      : m.mtype === 'messageContextInfo'
+                        ? m.message?.buttonsResponseMessage?.selectedButtonId ||
+                          m.message?.listResponseMessage?.singleSelectReply
+                            ?.selectedRowId ||
+                          m.text
+                        : '';
+  } catch (e) {
+    console.log(e);
+  }
 
   if (typeof body === 'string') {
     try {
@@ -241,8 +242,12 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
             await sock
               .groupParticipantsUpdate(senderNumber, [tag], 'add')
               .then((res) => {
-                utils.replyWithMention(senderNumber, jawab, [tag], m);
                 console.log(res);
+                if (res[0].status == '200') {
+                  utils.replyWithMention(senderNumber, jawab, [tag], m);
+                } else {
+                  utils.reply('gagal', senderNumber, m);
+                }
               })
               .catch((err) => console.log('bjir error ' + err));
           }
