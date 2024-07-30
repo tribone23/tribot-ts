@@ -29,6 +29,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@bochilteam/scraper": "^5.0.1",
     "@hapi/boom": "^10.0.1",
     "@whiskeysockets/baileys": "github:WhiskeySockets/Baileys",
     "axios": "^1.6.7",
@@ -37,11 +38,14 @@
     "google-spreadsheet": "^4.1.2",
     "libphonenumber-js": "^1.10.58",
     "mongodb": "^6.5.0",
+    "nexo-aio-downloader": "^1.4.1",
     "node-cache": "^5.1.2",
     "open": "^10.1.0",
     "phin": "^3.7.0",
     "pino": "^7.0.0",
+    "progress-estimator": "^0.3.1",
     "wa-sticker-formatter": "^4.4.4",
+    "youtube-dl-exec": "^3.0.7",
     "yt-search": "^2.10.4",
     "ytdl-core": "^4.11.5"
   }
