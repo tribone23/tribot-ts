@@ -29,7 +29,6 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@bochilteam/scraper": "^5.0.1",
     "@hapi/boom": "^10.0.1",
     "@whiskeysockets/baileys": "github:WhiskeySockets/Baileys",
     "axios": "^1.6.7",
