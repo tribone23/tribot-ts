@@ -18,7 +18,7 @@ type YoutubeAudio = {
   status: boolean;
   data: {
     title: string;
-    result: Buffer | ArrayBuffer;
+    result: Buffer;
     desc: string;
     thumbnail?: string;
   };
@@ -134,18 +134,21 @@ export async function getYoutubeVideo(url: string): Promise<ResultYoutube> {
 }
 export async function getYoutubeAudio(
   url: string,
-): Promise<ResultAudioYoutube | undefined> {
+): Promise<ResultAudioYoutube> {
   try {
     const customAudio = await nexo.youtube(url, 1);
-    const result = {
+    const result: ResultAudioYoutube = {
       success: true,
       result: customAudio,
     };
-    // console.log(result);
-    // console.log(result.result);
     return result;
   } catch (error) {
     console.log(error);
+    const result = {
+      success: false,
+      message: 'gagal',
+    };
+    return result;
   }
 }
 export async function getFacebookVideo(url: string): Promise<ResultFacebook> {

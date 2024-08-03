@@ -10,4 +10,6 @@ COPY . .
 
 RUN npm run build
 
-CMD ["node", "dist/index.js"]
+RUN npm install pm2 -g
+
+CMD ["pm2-runtime", "dist/index.js"]

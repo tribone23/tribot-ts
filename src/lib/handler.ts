@@ -129,14 +129,19 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         ? body.match(/^[\\/!#.]/gi)
         : '/';
       const prefix = prefixMatch instanceof Array ? prefixMatch[0] : '/';
+      // const firstmess = body.startsWith(prefix);
+      //let  command = body?.replace(prefix, '').trim().split(/ +/).shift().toLowerCase();
+      // console.log('prefike', prefix);
       const trimmedBody = body.replace(prefix, '').trim();
+      console.log('trim e', trimmedBody);
       const words = trimmedBody.split(/ +/);
-
+      console.log('word e', words);
       let command;
 
       if (words.length > 0) {
         command = words[0].toLowerCase();
         m.args = words.slice(1);
+        console.log(command);
       } else {
         m.args = [];
       }

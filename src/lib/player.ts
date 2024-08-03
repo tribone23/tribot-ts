@@ -5,7 +5,7 @@ import { IWebMessageInfoExtended } from './types.js';
 
 type YoutubeAudioData = {
   type: string;
-  data: Buffer | ArrayBuffer;
+  data: Buffer;
 };
 
 export default async function ytPlayer(
@@ -18,10 +18,10 @@ export default async function ytPlayer(
     // const start = performance.now();
     const result = await getYoutubeAudio(url);
     console.log('hasil e', result);
-    if (result?.success) {
+    if (result?.success && result.result?.data?.result) {
       const data: YoutubeAudioData = {
         type: 'audio',
-        data: result.result?.data?.result,
+        data: result.result.data.result,
       };
 
       // await utils.sendAttachment(data, senderNumber, m);
