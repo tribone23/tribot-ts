@@ -1,5 +1,4 @@
 import axios from 'axios';
-import nexo from 'nexo-aio-downloader';
 
 type Tiktok = {
   status: string;
@@ -13,16 +12,9 @@ type Youtube = {
   title: string;
   url: string;
   format: string;
+  creator_api: string;
 };
-type YoutubeAudio = {
-  status: boolean;
-  data: {
-    title: string;
-    result: Buffer;
-    desc: string;
-    thumbnail?: string;
-  };
-};
+
 type Facebook = {
   url: string;
   sd: string;
@@ -45,12 +37,6 @@ type ResultYoutube = {
   success: boolean;
   message?: string;
   result?: Youtube;
-};
-
-type ResultAudioYoutube = {
-  success: boolean;
-  message?: string;
-  result?: YoutubeAudio;
 };
 
 type ResultFacebook = {
@@ -132,25 +118,7 @@ export async function getYoutubeVideo(url: string): Promise<ResultYoutube> {
     }
   }
 }
-export async function getYoutubeAudio(
-  url: string,
-): Promise<ResultAudioYoutube> {
-  try {
-    const customAudio = await nexo.youtube(url, 1);
-    const result: ResultAudioYoutube = {
-      success: true,
-      result: customAudio,
-    };
-    return result;
-  } catch (error) {
-    console.log(error);
-    const result = {
-      success: false,
-      message: 'gagal',
-    };
-    return result;
-  }
-}
+
 export async function getFacebookVideo(url: string): Promise<ResultFacebook> {
   try {
     const { data } = await axios.get<Facebook>(

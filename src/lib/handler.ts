@@ -17,6 +17,8 @@ import { facebook } from '../commands/fb.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import { play } from '../commands/play.js';
 import { recapSpend, spendOut } from '../commands/spend.js';
+import { chatAi, aiChatModel } from './chatAi.js';
+import { model, chat, Tesco, genAI } from './chatAi.js';
 import { sock } from '../index.js';
 
 import 'dotenv/config';
@@ -129,22 +131,22 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         ? body.match(/^[\\/!#.]/gi)
         : '/';
       const prefix = prefixMatch instanceof Array ? prefixMatch[0] : '/';
-      // const firstmess = body.startsWith(prefix);
-      //let  command = body?.replace(prefix, '').trim().split(/ +/).shift().toLowerCase();
-      // console.log('prefike', prefix);
       const trimmedBody = body.replace(prefix, '').trim();
-      console.log('trim e', trimmedBody);
       const words = trimmedBody.split(/ +/);
-      console.log('word e', words);
-      let command;
 
+      // console.log('words ' + words);
+      let command;
       if (words.length > 0) {
         command = words[0].toLowerCase();
         m.args = words.slice(1);
-        console.log(command);
       } else {
         m.args = [];
       }
+      const firstmess = body.startsWith(prefix);
+      // console.log('prefix ' + prefix);
+      // console.log('body ' + body);
+      // console.log('commande ' + command);
+      // console.log('firstmess ' + firstmess);
 
       const userState = await aiChatHandler(
         body,
@@ -154,6 +156,8 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         m.key.remoteJid,
         ownnumber,
       );
+
+      await chatAi(body, command, senderNumber, m.key.remoteJid, ownnumber, m);
 
       /* 
       WIP - Work in Progress
@@ -182,162 +186,218 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       if (mentionByReply == ownnumber) {
         utils.reply('GA SUKA DI REPLY!!', senderNumber, m);
       }
-
-      switch (command) {
-        case 'p':
-          // kalau debugging di local saja mas
-          console.log(isAdmin, isBotGroupAdmins, isSadmin, 'true kabek kah');
-          console.log('sek sek sek');
-          console.log(groupMembers);
-          console.log('nomer bot e', ownnumber);
-          break;
-        case 'jodohku':
-          {
-            const member = groupMembers.map((i) => i.id);
-            console.log(member);
-            const jodo = member[Math.floor(Math.random() * member.length)];
-            console.log(jodo);
-            const jawab = `jodo kamu adalah @${
-              jodo.split('@')[0]
-            }\nsegera ke KUA sukolilo ya`;
-            const mentions = [jodo];
-            sock.sendMessage(
-              senderNumber,
-              { text: jawab, mentions: mentions },
-              { quoted: m },
-            );
-          }
-          break;
-
-        case 'kick':
-          if (!isGroup) {
-            utils.reply('minimal di group', senderNumber, m);
+      if (firstmess) {
+        switch (command) {
+          case 'p':
+            // kalau debugging di local saja mas
+            console.log(isAdmin, isBotGroupAdmins, isSadmin, 'true kabek kah');
+            console.log('sek sek sek');
+            console.log(groupMembers);
+            console.log('nomer bot e', ownnumber);
             break;
-          } else if (!isBotGroupAdmins) {
-            console.log(isBotGroupAdmins);
-            utils.reply('BOT BUKAN ADMIN ', senderNumber, m);
-            break;
-          }
-          await sock
-            .groupParticipantsUpdate(senderNumber, [tag], 'remove')
-            .then(() => {
-              utils.reply(
-                `Mampus keluar lu ${
-                  tag.split('@')[0]
-                } jauh jauh dari group ${groupName} ini`,
+          case 'jodohku':
+            {
+              const member = groupMembers.map((i) => i.id);
+              console.log(member);
+              const jodo = member[Math.floor(Math.random() * member.length)];
+              console.log(jodo);
+              const jawab = `jodo kamu adalah @${
+                jodo.split('@')[0]
+              }\nsegera ke KUA sukolilo ya`;
+              const mentions = [jodo];
+              sock.sendMessage(
                 senderNumber,
-                m,
+                { text: jawab, mentions: mentions },
+                { quoted: m },
               );
-            })
-            .catch((err) => console.log('bjir error ' + err));
-          break;
-        case 'add':
-          {
-            console.log('tes');
+            }
+            break;
+          case 'kick':
             if (!isGroup) {
               utils.reply('minimal di group', senderNumber, m);
               break;
             } else if (!isBotGroupAdmins) {
+              console.log(isBotGroupAdmins);
               utils.reply('BOT BUKAN ADMIN ', senderNumber, m);
               break;
             }
-            const jawab: string =
-              `Berhasil menambahkan  ${tag.split('@')[0]} ke dalam group ${groupName}` ||
-              '';
             await sock
-              .groupParticipantsUpdate(senderNumber, [tag], 'add')
-              .then((res) => {
-                console.log(res);
-                if (res[0].status == '200') {
-                  utils.replyWithMention(senderNumber, jawab, [tag], m);
-                } else {
-                  utils.reply('gagal', senderNumber, m);
-                }
+              .groupParticipantsUpdate(senderNumber, [tag], 'remove')
+              .then(() => {
+                utils.reply(
+                  `Mampus keluar lu ${
+                    tag.split('@')[0]
+                  } jauh jauh dari group ${groupName} ini`,
+                  senderNumber,
+                  m,
+                );
               })
               .catch((err) => console.log('bjir error ' + err));
+            break;
+          case 'add':
+            {
+              console.log('tes');
+              if (!isGroup) {
+                utils.reply('minimal di group', senderNumber, m);
+                break;
+              } else if (!isBotGroupAdmins) {
+                utils.reply('BOT BUKAN ADMIN ', senderNumber, m);
+                break;
+              }
+              const jawab: string =
+                `Berhasil menambahkan  ${tag.split('@')[0]} ke dalam group ${groupName}` ||
+                '';
+              await sock
+                .groupParticipantsUpdate(senderNumber, [tag], 'add')
+                .then((res) => {
+                  console.log(res);
+                  if (res[0].status == '200') {
+                    utils.replyWithMention(senderNumber, jawab, [tag], m);
+                  } else {
+                    utils.reply('gagal', senderNumber, m);
+                  }
+                })
+                .catch((err) => console.log('bjir error ' + err));
+            }
+            break;
+          case 'hidetag':
+          case 'pengumuman':
+            {
+              const member: Array<string> = [];
+              // console.log('groupMetadata ' + typeof groupMetadata);
+              // console.log('isGroup ' + typeof isGroup);
+              // console.log('groupMembers ' + typeof groupMembers);
+              // console.log(groupMetadata.participants);
+              groupMembers.map((i) => member.push(i.id));
+              sock.sendMessage(senderNumber, {
+                text: q ? q : 'test',
+                mentions: member,
+              });
+            }
+            break;
+          case 'help':
+            await helpCommand(senderNumber, m);
+            break;
+          case 'ip':
+            await ipaddr(senderNumber);
+            break;
+          case 'forward': {
+            const q: string = m.args.join(' ');
+            utils.sendForward(senderNumber, q, true);
+            break;
           }
-          break;
-        case 'hidetag':
-        case 'pengumuman':
-          {
-            const member: Array<string> = [];
-            // console.log('groupMetadata ' + typeof groupMetadata);
-            // console.log('isGroup ' + typeof isGroup);
-            // console.log('groupMembers ' + typeof groupMembers);
-            // console.log(groupMetadata.participants);
-            groupMembers.map((i) => member.push(i.id));
-            sock.sendMessage(senderNumber, {
-              text: q ? q : 'test',
-              mentions: member,
-            });
+          case 'forward1': {
+            const q: string = m.args.join(' ');
+            utils.sendForward(senderNumber, q, false);
+            break;
           }
-          break;
-        case 'help':
-          await helpCommand(senderNumber, m);
-          break;
+          case 'test':
+            utils.sendText(`testo testo dari ${m.pushName}`, senderNumber);
+            break;
+          case 'speedtest':
+            utils.sendText('Performing server speedtest...', senderNumber);
+            await speedtest(senderNumber, m);
+            break;
+          case 'sh':
+          case 'shell':
+            if (who === owner1 || who === owner2) {
+              await shell(m.args, senderNumber, m);
+            } else {
+              const filePath = path.resolve('./src/assets/dikira_lucu.jpg');
+              const media = fs.readFileSync(filePath);
+              const vn: string =
+                'https://bucin-livid.vercel.app/audio/lusiapa.mp3';
+              await utils.sendAudio(senderNumber, vn, m);
+              await sticker(senderNumber, media, m);
+            }
+            break;
+          case 's':
+          case 'sticker': {
+            const media = await downloadMediaMessage(m, 'buffer', {});
+            if (media instanceof Buffer) {
+              await sticker(senderNumber, media, m);
+            } else {
+              console.error('Downloaded media is not a Buffer.');
+            }
+            break;
+          }
+          case 'tt':
+          case 'tiktok':
+            await tiktok(m.args, senderNumber, m);
+            break;
+          case 'ytmp4':
+            {
+              console.log(m.args[0]);
+              console.log(m.args[1]);
+            }
+            break;
+          case 'fb':
+            await facebook(m.args, senderNumber, m);
+            break;
+          case 'play':
+            await play(m.args, senderNumber, m);
+            break;
+          case 'button':
+            await utils.sendButtons(senderNumber, m);
+            break;
+          case 'keluar':
+            await spendOut(m.args, who, senderNumber, m);
+            break;
+          case 'rekap':
+            await recapSpend(m.args, who, senderNumber, m);
+            break;
+          case 'poll':
+            console.log(m);
+            if (m.args.length > 0) {
+              const options: PollMessageOptions = {
+                name: m.args.join(' '),
+                selectableCount: 1,
+                values: ['Waduh', 'Wadah', 'Waduhh'],
+              };
+              utils.sendPoll(options, senderNumber, m);
+            } else {
+              utils.sendText(
+                'Please provide a question for the poll.',
+                senderNumber,
+              );
+            }
 
-        case 'ip':
-          await ipaddr(senderNumber);
-          break;
-        case 'forward': {
-          const q: string = m.args.join(' ');
-          utils.sendForward(senderNumber, q, true);
-          break;
-        }
-        case 'forward1': {
-          const q: string = m.args.join(' ');
-          utils.sendForward(senderNumber, q, false);
-          break;
-        }
-        case 'test':
-          utils.sendText(`testo testo dari ${m.pushName}`, senderNumber);
-          break;
-        case 'speedtest':
-          utils.sendText('Performing server speedtest...', senderNumber);
-          await speedtest(senderNumber, m);
-          break;
-        case 'sh':
-        case 'shell':
-          if (who === owner1 || who === owner2) {
-            await shell(m.args, senderNumber, m);
-          } else {
-            const filePath = path.resolve('./src/assets/dikira_lucu.jpg');
-            const media = fs.readFileSync(filePath);
-            const vn: string =
-              'https://bucin-livid.vercel.app/audio/lusiapa.mp3';
-            await utils.sendAudio(senderNumber, vn, m);
-            await sticker(senderNumber, media, m);
+            break;
+          case 'ppp':
+            {
+              console.log('tes');
+              if (userState.aiModeEnabled === false) {
+                userState.aiModeEnabled = true;
+                aiChatModel.set(senderNumber, userState);
+                model[senderNumber] = genAI.getGenerativeModel({
+                  model: 'gemini-1.5-flash',
+                });
+                console.log(model);
+                // Tesco();
+                chat[senderNumber] = model[senderNumber]?.startChat({
+                  history: [],
+                });
+                utils.reply('login', senderNumber, m);
+              }
+            }
+            break;
+          case 'aimode': {
+            userState.aiModeEnabled = true;
+            aiModeUsers.set(senderNumber, userState);
+            if (userState.characterId) {
+              utils.sendText(
+                `Memasuki mode AI dengan Character ID tersimpan *${userState.characterId}*\n\n[-] \`\`\`/reset /exit\`\`\`\n`,
+                senderNumber,
+              );
+            } else {
+              utils.sendText(
+                'Memasuki mode AI, silahkan masukkan ID Character..',
+                senderNumber,
+              );
+            }
+            break;
           }
-          break;
-        case 's':
-        case 'sticker': {
-          const media = await downloadMediaMessage(m, 'buffer', {});
-          if (media instanceof Buffer) {
-            await sticker(senderNumber, media, m);
-          } else {
-            console.error('Downloaded media is not a Buffer.');
-          }
-          break;
         }
-        case 'tt':
-        case 'tiktok':
-          await tiktok(m.args, senderNumber, m);
-          break;
-        case 'fb':
-          await facebook(m.args, senderNumber, m);
-          break;
-        case 'play':
-          await play(m.args, senderNumber, m);
-          break;
-        case 'button':
-          await utils.sendButtons(senderNumber, m);
-          break;
-        case 'keluar':
-          await spendOut(m.args, who, senderNumber, m);
-          break;
-        case 'rekap':
-          await recapSpend(m.args, who, senderNumber, m);
-          break;
         // case 'whoami': {
         //   const data = {
         //     _id: who,
@@ -357,41 +417,8 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
         //   utils.sendText(cekString || 'No data', senderNumber);
         //   break;
         // }
-        case 'poll':
-          console.log(m);
-          if (m.args.length > 0) {
-            const options: PollMessageOptions = {
-              name: m.args.join(' '),
-              selectableCount: 1,
-              values: ['Waduh', 'Wadah', 'Waduhh'],
-            };
-            utils.sendPoll(options, senderNumber, m);
-          } else {
-            utils.sendText(
-              'Please provide a question for the poll.',
-              senderNumber,
-            );
-          }
-
-          break;
-        case 'aimode': {
-          userState.aiModeEnabled = true;
-          aiModeUsers.set(senderNumber, userState);
-
-          if (userState.characterId) {
-            utils.sendText(
-              `Memasuki mode AI dengan Character ID tersimpan *${userState.characterId}*\n\n[-] \`\`\`/reset /exit\`\`\`\n`,
-              senderNumber,
-            );
-          } else {
-            utils.sendText(
-              'Memasuki mode AI, silahkan masukkan ID Character..',
-              senderNumber,
-            );
-          }
-          break;
-        }
       }
+      ////
     } catch (err) {
       console.log(err);
     }

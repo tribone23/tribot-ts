@@ -1,12 +1,7 @@
-import { getYoutubeAudio } from './downloader.js';
-import { sock } from '../index.js';
+import { downloadAudio } from './youtubedownloader.js';
+import fs from 'fs';
 import utils from './utils.js';
-import { IWebMessageInfoExtended } from './types.js';
-
-type YoutubeAudioData = {
-  type: string;
-  data: Buffer;
-};
+import { IWebMessageInfoExtended, AttachmentInfo } from './types.js';
 
 export default async function ytPlayer(
   url: string,
@@ -15,24 +10,24 @@ export default async function ytPlayer(
   m: IWebMessageInfoExtended,
 ) {
   try {
-    // const start = performance.now();
-    const result = await getYoutubeAudio(url);
-    console.log('hasil e', result);
-    if (result?.success && result.result?.data?.result) {
-      const data: YoutubeAudioData = {
+    const start = performance.now();
+    const result = await downloadAudio(url);
+
+    if (result.status && result.path) {
+      const data: AttachmentInfo = {
         type: 'audio',
-        data: result.result.data.result,
+        url: result.path,
       };
 
-      // await utils.sendAttachment(data, senderNumber, m);
-      // const end = performance.now();
-      await sock.sendMessage(
+      await utils.sendAttachment(data, senderNumber, m);
+      const end = performance.now();
+      await utils.sendText(
+        `⏱️ it tooks ${end - start} miliseconds`,
         senderNumber,
-        { audio: data.data, mimetype: 'audio/mp4' },
-        // can send mp3, mp4, & ogg
       );
+      fs.unlinkSync(result.path);
     } else {
-      utils.reply('gagal', senderNumber, m);
+      utils.reply(result.message!, senderNumber, m);
     }
 
     // const data: AttachmentInfo = {
