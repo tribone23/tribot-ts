@@ -12,7 +12,7 @@ import { helpCommand } from '../commands/help.js';
 import { speedtest } from '../commands/speedtest.js';
 import { shell } from '../commands/shell.js';
 import { sticker } from '../commands/sticker.js';
-import { tiktok } from '../commands/tiktok.js';
+import { tiktok, tiktok2 } from '../commands/tiktok.js';
 import { facebook } from '../commands/fb.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import { play } from '../commands/play.js';
@@ -324,6 +324,10 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
           case 'tt':
           case 'tiktok':
             await tiktok(m.args, senderNumber, m);
+            break;
+          case 'tt2':
+          case 'tiktok2':
+            await tiktok2(m.args, senderNumber, m);
             break;
           case 'ytmp4':
             {

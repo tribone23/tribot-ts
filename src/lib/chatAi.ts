@@ -10,9 +10,9 @@ export const model: any = {};
 export const aiChatModel = new Map<string, UserState>();
 export const chat: any = {};
 
-// export const Tesco = (model: { [key: string]: any }, sender: string): void => {
-//   console.log(model[sender]);
-// };
+export const Tesco = (model: { [key: string]: any }, sender: string): void => {
+  console.log(model[sender]);
+};
 
 const result: any = {};
 export const chatAi = async (

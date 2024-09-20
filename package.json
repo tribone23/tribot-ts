@@ -33,6 +33,7 @@
     "@distube/ytdl-core": "^4.14.4",
     "@google/generative-ai": "^0.17.1",
     "@hapi/boom": "^10.0.1",
+    "@tobyg74/tiktok-api-dl": "^1.1.9",
     "@whiskeysockets/baileys": "github:WhiskeySockets/Baileys",
     "axios": "^1.6.7",
     "dotenv": "^16.4.5",

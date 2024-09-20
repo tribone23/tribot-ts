@@ -1,10 +1,12 @@
 import axios from 'axios';
+import tiktokdl from '@tobyg74/tiktok-api-dl';
+// import { tiktok } from '../commands/tiktok';
 
 type Tiktok = {
   status: string;
-  by: string;
-  message: string;
-  author: string;
+  by?: string;
+  message?: string;
+  author?: string;
   url: string;
 };
 
@@ -32,6 +34,11 @@ type ResultTiktok = {
   message?: string;
   result?: TiktokApiResponse;
 };
+type ResultTiktok2 = {
+  success: boolean;
+  message?: string;
+  result?: string;
+};
 
 type ResultYoutube = {
   success: boolean;
@@ -45,6 +52,25 @@ type ResultFacebook = {
   result?: Facebook;
 };
 
+export const getTiktokVideoV2 = async (url: string): Promise<ResultTiktok2> => {
+  try {
+    const data = await tiktokdl.Downloader(url, {
+      version: 'v2',
+    });
+    const results: ResultTiktok2 = {
+      success: true,
+      message: data.result?.desc,
+      result: data.result?.video,
+    };
+    return results;
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      message: 'Error',
+    };
+  }
+};
 export async function getTiktokVideo(url: string): Promise<ResultTiktok> {
   try {
     const { data } = await axios.get<TiktokApiResponse>(
