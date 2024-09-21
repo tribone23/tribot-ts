@@ -17,8 +17,14 @@ import { facebook } from '../commands/fb.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import { play } from '../commands/play.js';
 import { recapSpend, spendOut } from '../commands/spend.js';
-import { chatAi, aiChatModel } from './chatAi.js';
-import { model, chat, Tesco, genAI } from './chatAi.js';
+import {
+  chatAi,
+  aiChatModel,
+  model,
+  chat,
+  genAI,
+  systemInstructions,
+} from './chatAi.js';
 import { sock } from '../index.js';
 
 import 'dotenv/config';
@@ -367,7 +373,9 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
             }
 
             break;
-          case 'ppp':
+          case 'tribone':
+          case 'trib':
+          case 'tri':
             {
               console.log('tes');
               if (userState.aiModeEnabled === false) {
@@ -375,13 +383,14 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
                 aiChatModel.set(senderNumber, userState);
                 model[senderNumber] = genAI.getGenerativeModel({
                   model: 'gemini-1.5-flash',
+                  systemInstruction: systemInstructions,
                 });
                 console.log(model);
                 // Tesco();
                 chat[senderNumber] = model[senderNumber]?.startChat({
                   history: [],
                 });
-                utils.reply('login', senderNumber, m);
+                utils.reply('memasuki ai mode ....', senderNumber, m);
               }
             }
             break;
