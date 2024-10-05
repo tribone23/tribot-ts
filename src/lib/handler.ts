@@ -6,7 +6,7 @@ import {
   getContentType,
   PollMessageOptions,
 } from '@whiskeysockets/baileys';
-import { IWebMessageInfoExtended } from './types.js';
+import { AttachmentInfo, IWebMessageInfoExtended } from './types.js';
 import { ipaddr } from '../commands/ip.js';
 import { helpCommand } from '../commands/help.js';
 import { speedtest } from '../commands/speedtest.js';
@@ -17,6 +17,7 @@ import { facebook } from '../commands/fb.js';
 import { aiModeUsers, aiChatHandler } from '../commands/ai.js';
 import { play } from '../commands/play.js';
 import { recapSpend, spendOut } from '../commands/spend.js';
+import { videoDownloader } from './videoDownloader.js';
 import {
   chatAi,
   aiChatModel,
@@ -195,11 +196,46 @@ export default async function (m: IWebMessageInfoExtended): Promise<void> {
       if (firstmess) {
         switch (command) {
           case 'p':
-            // kalau debugging di local saja mas
-            console.log(isAdmin, isBotGroupAdmins, isSadmin, 'true kabek kah');
-            console.log('sek sek sek');
-            console.log(groupMembers);
-            console.log('nomer bot e', ownnumber);
+            {
+              // kalau debugging di local saja mas
+              // const filePath = path.resolve('./hasil.mp4');
+              // await sock.sendMessage(senderNumber, {
+              //   video: filePath,
+              //   caption: 'hello!',
+              //   gifPlayback: true,
+              //   ptv: false, // if set to true, will send as a `video note`
+              // });
+              // utils.sendAttachment('video', senderNumber, m);
+              // const data: AttachmentInfo = {
+              //   type: 'video',
+              //   url: filePath,
+              //   caption: `✨ Direct Link: ${filePath}`,
+              // };
+              // utils.sendAttachment(data, senderNumber, m);
+              // console.log(m.args[0]);
+            }
+            break;
+          case 'yt':
+            {
+              if (m.args[0] === '-h') {
+                const text = `
+                contoh penggunaan
+                .yt -r 1080 linkYoutube
+                .yt -r 720 linkYoutube
+                .yt -r 480 linkYoutbe
+                .yt -r 360 linkYoutbe
+                `;
+                utils.reply(text, senderNumber, m);
+              } else if (m.args[0] === '-r') {
+                await videoDownloader(m.args[2], m.args[1], senderNumber, m);
+              } else {
+                utils.reply(
+                  'Masukan sesuai format\n bantuan ? ketik .yt -h',
+                  senderNumber,
+                  m,
+                );
+              }
+            }
             break;
           case 'jodohku':
             {

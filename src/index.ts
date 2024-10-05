@@ -33,7 +33,7 @@ setInterval(() => {
 async function triBotInitialize(reconnectAttempt = 0) {
   const { state, saveCreds } = await useMultiFileAuthState('auth');
   const { version } = await fetchLatestBaileysVersion();
-  const maxReconnectAttempts = 5;
+  const maxReconnectAttempts = 10;
   const reconnectDelay = 5000;
 
   const sock = makeWASocket({
@@ -66,6 +66,14 @@ async function triBotInitialize(reconnectAttempt = 0) {
         setTimeout(() => {
           triBotInitialize(reconnectAttempt + 1);
         }, reconnectDelay);
+      } else if (
+        lastDisconnect &&
+        (lastDisconnect.error as Boom)?.output?.statusCode === 428
+      ) {
+        setTimeout(() => {
+          triBotInitialize(reconnectAttempt + 1);
+        }, reconnectDelay);
+        console.log('status code 428');
       } else {
         console.log(
           'Connection closed. You are logged out or max attempts reached.',

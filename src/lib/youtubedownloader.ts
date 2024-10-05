@@ -45,13 +45,9 @@ export const downloadAudio = async (url: string): Promise<Result> => {
 };
 export const downloadVideo = async (
   url: string,
-  kualitas?: string,
+  kualitas?: string[],
 ): Promise<Result> => {
-  // const audioStream = ytdl(url, {
-  //   filter: 'audioonly',
-  //   quality: 'highestaudio',
-  // });
-  const resolusine = kualitas ? kualitas : resolusi[2];
+  const resolusine = kualitas ? kualitas : resolusi[1];
   const info = await ytdl.getInfo(url);
   const audioStream: any = ytdl.downloadFromInfo(info, {
     quality: 'highestaudio',
@@ -64,20 +60,25 @@ export const downloadVideo = async (
   const filevideo: string = path.resolve('video.mp4');
   try {
     await Promise.all([
-      await streamToFile(audioStream, filelagu),
-      await streamToFile(videoStream, filevideo),
+      streamToFile(audioStream, filelagu),
+      streamToFile(videoStream, filevideo),
     ]);
     console.log('berhasil menyimpan');
     await mergeFile(filelagu, filevideo, result);
     console.log('berhasil menyimpan gabungan');
+    // fs.unlinkSync(filelagu);
+    // fs.unlinkSync(filevideo);
     return {
       status: true,
+      path: result,
+      message: 'dono bang',
     };
   } catch (error) {
-    console.log(error);
+    console.log('error dowloadvideo ' + result);
     return {
-      status: true,
-      error: error,
+      status: false,
+      path: result,
+      message: 'error: ' + error,
     };
   }
 
@@ -111,11 +112,16 @@ const mergeFile = async (
       .outputOptions('-c:a aac')
       .outputOptions('-strict experimental')
       .on('error', (error: any) => {
-        console.log(error);
-        rejects(error);
+        if (error.message.includes('non-fatal')) {
+          console.log('Non-fatal error occurred but continuing: ', error);
+          // resolve();
+        } else {
+          console.log('ffmpeg fatal error: ', error);
+          rejects(error);
+        }
       })
       .on('end', () => {
-        console.log(' finished !');
+        console.log('finished !');
         resolve();
       })
       .saveToFile(result);
